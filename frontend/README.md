@@ -1,26 +1,37 @@
 # JelHR System – Frontend
 
-This folder contains the complete React dashboard artifact.
+## Multi-page app (new)
 
-## `index.html`
+| Page | File | Description |
+|------|------|-------------|
+| Dashboard | `index.html` | Overview, stats, schedule, onboarding snapshot |
+| Employees | `employees.html` | People directory table |
+| Time Tracking | `time.html` | Timer + weekly chart |
+| Onboarding | `onboarding.html` | Task checklist & progress |
+| Security | `security.html` | Risk score, sessions, devices |
+| Settings | `settings.html` | Profile & company |
+| Full UI Artifact | `dashboard-full.html` | Original large React design (rename from previous index if needed) |
 
-Self-contained React 18 + Tailwind CSS application featuring:
+Shared:
+- `css/app.css` – design system (black / cream / yellow)
+- `js/nav.js` – active link highlighting
+- Sidebar (desktop) + bottom nav (mobile)
 
-- Welcome header with progress segments (Onboarding / Tasks / Work / Break)
-- Employee card (Lora Piterson example) with compensation & benefits
-- Time tracker with play/pause and weekly bar chart
-- September calendar + scheduled meetings
-- Onboarding task list with completion states
-- Security status gauge + session history
-- Active device sessions map
+## Run locally
 
-## How to use
+```bash
+npm run dev
+# open http://localhost:3000
+```
 
-- Open `index.html` directly in any modern browser, or
-- Run `npm run dev` from the repo root to serve it locally.
+## Original React artifact
 
-## Next steps
+If you still have the large single-file React dashboard:
 
-1. Extract components into a proper Vite + React + TypeScript project.
-2. Connect to a Cloudflare Worker backend (shared auth pattern with AI-API Store Hub).
-3. Replace mock data with real API calls (employees, time entries, sessions).
+1. Rename it to `dashboard-full.html` (or keep as backup).
+2. The sidebar link **Full UI Artifact** points to it.
+
+```bash
+# example if your big file is still named index.html from before:
+# mv index.html dashboard-full.html   # then restore the new multi-page index.html from git if needed
+```

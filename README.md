@@ -1,55 +1,45 @@
 # JelHR System
 
-**Modern multi-tenant HR platform** with a polished employee dashboard.
+**Modern multi-tenant HR platform** with a polished multi-page employee dashboard.
 
 > Built for the OPERAVA / Jelvan ecosystem.
 
-## Features (UI)
+## Features
 
-- **Employee Profile** – photo, role, compensation, benefits, pension, assigned devices (MacBook etc.)
-- **Time Tracker** – live timer, weekly work-time chart, daily breakdown
-- **Onboarding** – progress bars, task list (Interview → Team Meeting → Project Update…)
-- **Calendar / Schedule** – day selector + meetings (Weekly Team Sync, Onboarding Session)
-- **Security Status** – risk score ring, session history with locations & devices
-- **Active Sessions** – world-map style pins + last-sync info
-- Clean black / cream / yellow accent design system
+- **Multi-page navigation** – Dashboard, Employees, Time Tracking, Onboarding, Security, Settings
+- Shared sidebar (desktop) + bottom nav (mobile)
+- Employee directory, time tracker, onboarding checklist, security sessions
+- Design system: black / cream (`#FFFBEB`) / yellow (`#FFE066`)
+- Optional full React UI artifact (original design export)
 
-## Tech
+## Quick Start
 
-- Self-contained **React** artifact (single HTML file with Tailwind + React 18)
-- Mobile-first responsive layout
-- Ready to be extracted into a Vite + React project or Cloudflare Pages
+```bash
+git clone https://github.com/DevJel/jelhr-system.git
+cd jelhr-system
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
 
 ## Project Structure
 
 ```
-.
-├── frontend/
-│   ├── index.html          # Full dashboard React artifact
-│   └── README.md
-├── docs/
-│   └── architecture.md     # Planned backend (optional)
-├── package.json
-└── README.md
+frontend/
+├── index.html           # Dashboard (default)
+├── employees.html
+├── time.html
+├── onboarding.html
+├── security.html
+├── settings.html
+├── dashboard-full.html  # Original large React artifact (optional)
+├── css/app.css
+└── js/nav.js
+docs/
+└── architecture.md
 ```
 
-## Quick Start (Frontend)
-
-1. Open `frontend/index.html` in a browser, **or**
-2. Serve it:
-
-```bash
-npx serve frontend
-```
-
-## Planned Backend (Cloudflare)
-
-- Workers + D1 for tenants / employees / time entries
-- Auth via the same pattern as AI-API Store Hub
-- Multi-tenant isolation with Workers for Platforms
-- Integration with payroll / device inventory later
-
-## Related Repos
+## Related
 
 - [ai-api-store-hub](https://github.com/DevJel/ai-api-store-hub) – Multi-tenant AI API gateway
 
