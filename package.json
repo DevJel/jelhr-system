@@ -1,0 +1,13 @@
+{
+  "name": "jelhr-system",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JelHR System – Modern HR dashboard & multi-tenant HR platform",
+  "scripts": {
+    "dev": "npx serve frontend -p 3000",
+    "start": "npx serve frontend"
+  },
+  "keywords": ["hr", "dashboard", "react", "employee", "time-tracking", "onboarding"],
+  "author": "DevJel / OPERAVA",
+  "license": "MIT"
+}
