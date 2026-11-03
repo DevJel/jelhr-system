@@ -6,6 +6,12 @@ A Cloudflare Pages + D1 HR workspace with separate administrator, employee and r
 
 The authentication and offboarding code paths have been added and the D1 schema has been applied to the connected database. **Authentication is not ready for real use until the production runtime secrets are configured, the initial owner is provisioned, and the smoke tests below pass.** Do not enter real employee, payroll, identity or health data until that sign-off is complete.
 
+## Screenshot-inspired UI update
+
+The sign-in and administrator dashboard use a light, rounded layout inspired by the supplied reference images. The original team illustration is generated for this project and embedded as a WebP data URL in `frontend/css/bolek.css`. Apple and Google sign-in are not offered; the existing email/password API remains the only sign-in method.
+
+At common desktop and phone viewport sizes, the sign-in and dashboard fit within the viewport. On mobile, the dashboard uses three selectable panels to keep its links accessible without page scrolling. Extremely short viewports may scroll so the sign-in form remains accessible. Other workspace pages have not yet been converted to this layout and may scroll. The dashboard links to existing modules; it does not add a hiring, payroll, applications, calendar, or reviews backend. Directory, time, onboarding, security, and settings behavior remains at the prototype/demo level described below. See the readiness checklist before using real data.
+
 ## Access model
 
 | Account type | Role | Access |
