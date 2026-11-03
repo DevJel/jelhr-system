@@ -1,12 +1,12 @@
 {
   "name": "jelhr-system",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
-  "description": "JelHR multi-page HR workspace demo and Cloudflare foundation",
+  "description": "JelHR multi-page HR workspace demo and Cloudflare Pages foundation",
   "scripts": {
-    "dev": "npx wrangler@latest dev",
+    "dev": "npx wrangler@latest pages dev frontend",
     "preview": "npx serve frontend -p 3000",
-    "deploy": "npx wrangler@latest deploy",
+    "deploy": "npx wrangler@latest pages deploy frontend --project-name=jelhr-system",
     "db:migrate:local": "npx wrangler@latest d1 migrations apply jelhr-system-db --local",
     "db:migrate:remote": "npx wrangler@latest d1 migrations apply jelhr-system-db --remote",
     "test": "node scripts/smoke-test.mjs"
