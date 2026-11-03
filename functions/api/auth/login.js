@@ -1,5 +1,5 @@
 const enc = new TextEncoder();
-const b64url = bytes => btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/=/g,"").replace(/\\+/g,"-").replace(/\\//g,"_");
+const b64url = bytes => btoa(String.fromCharCode(...new Uint8Array(bytes))).replaceAll("=","").replaceAll("+","-").replaceAll("/","_");
 const json = (body,status=200,headers={}) => Response.json(body,{status,headers:{"Cache-Control":"no-store",...headers}});
 async function digest(value){return b64url(await crypto.subtle.digest("SHA-256",enc.encode(value)));}
 async function passwordHash(password,salt){const key=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveBits"]);return b64url(await crypto.subtle.deriveBits({name:"PBKDF2",salt:enc.encode(salt),iterations:210000,hash:"SHA-256"},key,256));}
@@ -8,7 +8,7 @@ export async function onRequestPost({request,env}) {
  if(!env.DB || !env.JELHR_JWT_SECRET || env.JELHR_JWT_SECRET.length<32) return json({error:"Authentication service is not configured."},503);
  let body;try{body=await request.json()}catch{return json({error:"Invalid request."},400)}
  const email=String(body.email||"").trim().toLowerCase(),password=String(body.password||"");
- if(!/^\\S+@\\S+\\.\\S+$/.test(email)||password.length<1||password.length>256)return json({error:"Enter a valid email and password."},400);
+ if(!email.includes("@")||!email.split("@")[1]?.includes(".")||password.length<1||password.length>256)return json({error:"Enter a valid email and password."},400);
  const ip=request.headers.get("CF-Connecting-IP")||"unknown",rateKey=await digest(email+"|"+ip),now=Math.floor(Date.now()/1000);
  const rate=await env.DB.prepare("SELECT * FROM auth_rate_limits WHERE key=?").bind(rateKey).first();
  if(rate?.locked_until>now)return json({error:"Too many attempts. Try again later."},429);
