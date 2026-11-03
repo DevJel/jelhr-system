@@ -36,7 +36,7 @@ erDiagram
 
 Every future data query must derive `organization_id` from a verified session, never from an untrusted browser-supplied tenant header or request body. All write actions must create audit events in the same logical transaction/batch.
 
-## Authentication plan before real HR data
+## Authentication and remaining work before real HR data
 
 1. Invite-only organization owner bootstrap.
 2. Password hashing using a modern password KDF and constant-time verification.
@@ -46,7 +46,7 @@ Every future data query must derive `organization_id` from a verified session, n
 6. MFA and recovery controls before production onboarding.
 7. Rate limits and abuse monitoring for authentication routes.
 
-No authentication endpoints are enabled in the current demo deployment.
+Authentication endpoints for login, logout, current-user lookup and initial-owner bootstrap are present in the repository. Their presence does not establish that a particular deployment is configured or production-ready. The current implementation uses a signed JWT cookie and a D1 session record; see the root README for actual behavior, limitations and prerequisites. Items above remain review or future-work goals where not yet implemented.
 
 ## Privacy
 
