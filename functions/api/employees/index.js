@@ -1,0 +1,2 @@
+import {requireUser,respond} from "../_shared/auth.js";
+export async function onRequestGet({request,env}){const a=await requireUser(request,env,["owner","admin","hr_manager"]);if(a.error)return a.error;const r=await env.DB.prepare("SELECT id,employee_number,first_name,last_name,email,job_title,department,employment_status FROM employees WHERE organization_id=? AND employment_status IN ('active','onboarding','on_leave','offboarding') ORDER BY last_name,first_name").bind(a.user.organization_id).all();return respond({employees:r.results||[]})}
