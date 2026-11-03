@@ -2,22 +2,22 @@
 
 ## Deployment boundary
 
-The first Cloudflare release serves the current static multi-page experience from Workers Static Assets. The Worker runs first only for `/api/*`; all other requests are served as static assets.
+Cloudflare Pages serves the static multi-page application from `frontend/`. Pages Functions in the repository-level `functions/` directory handle API routes. The D1 binding is named `DB`.
 
 ## Request flow
 
 ```mermaid
 sequenceDiagram
   participant B as Browser
-  participant W as Cloudflare Worker
-  participant A as Static Assets
+  participant P as Cloudflare Pages
+  participant F as Pages Function
   participant D as D1
-  B->>W: GET /api/health
-  W->>D: SELECT 1
-  D-->>W: Database result
-  W-->>B: Health JSON
-  B->>A: GET /index.html
-  A-->>B: HTML / CSS / JavaScript
+  B->>P: GET /index.html
+  P-->>B: HTML / CSS / JavaScript
+  B->>F: GET /api/health
+  F->>D: SELECT 1
+  D-->>F: Database result
+  F-->>B: Health JSON
 ```
 
 ## Tenant model
