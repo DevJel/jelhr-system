@@ -1,13 +1,17 @@
 {
   "name": "jelhr-system",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "JelHR System – Modern HR dashboard & multi-tenant HR platform",
+  "description": "JelHR multi-page HR workspace demo and Cloudflare foundation",
   "scripts": {
-    "dev": "npx serve frontend -p 3000",
-    "start": "npx serve frontend"
+    "dev": "npx wrangler@latest dev",
+    "preview": "npx serve frontend -p 3000",
+    "deploy": "npx wrangler@latest deploy",
+    "db:migrate:local": "npx wrangler@latest d1 migrations apply jelhr-system-db --local",
+    "db:migrate:remote": "npx wrangler@latest d1 migrations apply jelhr-system-db --remote",
+    "test": "node scripts/smoke-test.mjs"
   },
-  "keywords": ["hr", "dashboard", "react", "employee", "time-tracking", "onboarding"],
-  "author": "DevJel / OPERAVA",
+  "keywords": ["hr", "dashboard", "employee", "time-tracking", "onboarding", "cloudflare", "d1"],
+  "author": "DevJel",
   "license": "MIT"
 }

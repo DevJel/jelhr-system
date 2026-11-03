@@ -7,6 +7,8 @@
     var file = href.split('/').pop();
     if (file === path || (path === '' && file === 'index.html')) a.classList.add('active');
   });
+  // The original React artifact is not part of this multi-page release.
+  document.querySelectorAll('a[href="dashboard-full.html"]').forEach(function (a) { a.remove(); });
   var script = document.createElement('script');
   script.src = 'js/app.js';
   script.defer = true;
