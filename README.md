@@ -1,48 +1,75 @@
 # JelHR System
 
-**Modern multi-tenant HR platform** with a polished multi-page employee dashboard.
+A responsive, multi-page HR workspace foundation for employee records, time tracking, onboarding, security visibility and organization settings. The existing black / cream / yellow visual direction is retained.
 
-> Built for the OPERAVA / Jelvan ecosystem.
+> **Deployment mode:** public interactive demo. Demo records are browser-local and clearly marked. The Cloudflare Worker currently exposes a health endpoint only; authenticated multi-tenant data APIs are not yet enabled. Do not enter real employee, payroll, identity or health data into the demo.
 
-## Features
+## Current modules
 
-- **Multi-page navigation** – Dashboard, Employees, Time Tracking, Onboarding, Security, Settings
-- Shared sidebar (desktop) + bottom nav (mobile)
-- Employee directory, time tracker, onboarding checklist, security sessions
-- Design system: black / cream (`#FFFBEB`) / yellow (`#FFE066`)
-- Optional full React UI artifact (original design export)
+| Module | Included | Current behavior |
+|---|---|---|
+| Dashboard | KPI overview, schedule and onboarding snapshot | Summary view |
+| Employees | Directory, search, status filter, add employee, CSV export | Browser-local demo data |
+| Time tracking | Start / pause timer | Browser-local timer entries |
+| Onboarding | Eight-step checklist and progress | Browser-local task state |
+| Security | Session/device overview | Demo-only session list; no real session revocation |
+| Settings | Profile and workspace preferences | Browser-local preferences |
+| API health | Worker and D1 connectivity | `GET /api/health` |
 
-## Quick Start
+## Run locally
 
 ```bash
-git clone https://github.com/DevJel/jelhr-system.git
-cd jelhr-system
+npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open http://localhost:3000. The static prototype runs without credentials. Changes are stored in the current browser under `jelhr.demo.v1`.
 
-## Project Structure
+## Cloudflare architecture
 
-```
-frontend/
-├── index.html           # Dashboard (default)
-├── employees.html
-├── time.html
-├── onboarding.html
-├── security.html
-├── settings.html
-├── dashboard-full.html  # Original large React artifact (optional)
-├── css/app.css
-└── js/nav.js
-docs/
-└── architecture.md
+- Workers Static Assets serves `frontend/`.
+- Worker script in `src/index.js` routes `/api/*`.
+- D1 database binding: `DB`.
+- SQL migrations are in `migrations/`.
+
+```mermaid
+flowchart TD
+  Browser[Browser UI] -->|HTML CSS JS| Assets[Workers Static Assets]
+  Browser -->|GET /api/health| Worker[Cloudflare Worker]
+  Worker --> D1[(Cloudflare D1)]
+  Worker -->|other API routes| Reserved[Reserved for authenticated API]
 ```
 
-## Related
+### Deploy
 
-- [ai-api-store-hub](https://github.com/DevJel/ai-api-store-hub) – Multi-tenant AI API gateway
+```bash
+npx wrangler d1 migrations apply jelhr-system-db --remote
+npx wrangler deploy
+```
 
-## License
+The Wrangler configuration is already linked to the project D1 database. Deploy from the repository root using a Cloudflare account with access to the **Jelvan - Projects - Works** account.
 
-MIT
+## D1 data model
+
+The initial migration creates organization-scoped tables for organizations, users, employees, time entries, onboarding tasks, sessions, audit logs and organization settings. Every business-data table carries an `organization_id` so future API handlers can enforce tenant boundaries.
+
+## Security and production readiness
+
+- No production credentials or secrets are committed.
+- Demo browser data is not a secure database and is not shared across devices.
+- The public health endpoint reveals service/database status only.
+- Employee and HR API routes deliberately return 404 until authentication and tenant authorization are implemented.
+- Do not deploy real employee data or enable payroll actions until login, invitation, password reset, MFA, RBAC, tenant-scoped queries, audit coverage, backup/restore and privacy controls pass review.
+
+## Project structure
+
+```
+frontend/                 Static responsive UI
+  css/app.css              Shared design system
+  js/nav.js                Navigation and bootstrap
+  js/app.js                Demo interactions and browser persistence
+src/index.js               Cloudflare Worker entry point
+migrations/0001_init.sql   Tenant-aware D1 schema
+docs/architecture.md       Architecture and security boundaries
+wrangler.toml              Worker, static assets and D1 binding
+```

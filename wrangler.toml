@@ -1,0 +1,14 @@
+name = "jelhr-system"
+main = "src/index.js"
+compatibility_date = "2026-11-03"
+
+[assets]
+directory = "./frontend"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "jelhr-system-db"
+database_id = "99699f6d-e0e8-4e1c-a161-80dd698761d9"
+migrations_dir = "migrations"
