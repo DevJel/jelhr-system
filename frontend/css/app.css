@@ -1,13 +1,13 @@
 /* JelHR System – Shared styles */
 :root {
-  --bg: #F5F2EB;
-  --card: #FFFBEB;
+  --bg: #EEF0F4;
+  --card: #F8F9FB;
   --card-white: #FFFFFF;
-  --ink: #111111;
-  --muted: rgba(0,0,0,0.5);
-  --muted-2: rgba(0,0,0,0.35);
-  --accent: #FFE066;
-  --border: rgba(0,0,0,0.08);
+  --ink: #25272D;
+  --muted: #777D88;
+  --muted-2: #9AA0AA;
+  --accent: #F58220;
+  --border: rgba(37,39,45,0.09);
   --radius: 20px;
   --radius-sm: 12px;
   --sidebar-w: 240px;
@@ -75,7 +75,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 .brand-sub {
   font-size: 10px;
-  color: rgba(255,255,255,0.45);
+  color: #9298A3;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -95,7 +95,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border-radius: 12px;
   font-size: 13px;
   font-weight: 500;
-  color: rgba(255,255,255,0.65);
+  color: #626975;
   transition: background 0.15s, color 0.15s;
 }
 
@@ -378,7 +378,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 
 .mobile-nav a {
-  color: rgba(255,255,255,0.55);
+  color: #737985;
   font-size: 10px;
   display: flex;
   flex-direction: column;
@@ -395,4 +395,22 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 @media (max-width: 640px) {
   .mobile-nav { display: flex; }
   .main { padding-bottom: 5rem; }
+}
+
+
+/* Refined neutral SaaS surface: cool gray canvas, white panels, restrained orange accent. */
+.sidebar .brand-mark { background: #F58220; color: #fff; }
+.sidebar .nav a.active { background: rgba(245,130,32,.12); color: #C65E0B; }
+.sidebar .user-avatar { background: #292C33; color: #fff; }
+.card {
+  border-color: rgba(255,255,255,.9);
+  box-shadow: 0 8px 28px rgba(30,36,48,.045);
+}
+.card-cream { background: #F8F9FB; }
+.card-dark { background: #292C33; }
+.btn-accent { background: #F58220; color: #fff; }
+.btn-accent:hover { background: #DF6D12; }
+.badge-yellow { background: rgba(245,130,32,.14); color: #B95608; }
+@media (max-width: 640px) {
+  .mobile-nav { backdrop-filter: blur(16px); }
 }
