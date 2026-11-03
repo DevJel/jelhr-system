@@ -8,6 +8,7 @@ JelHR is a Cloudflare Pages and D1 foundation for people operations. Its goal is
 
 - [Purpose and intended users](#purpose-and-intended-users)
 - [Current feature inventory](#current-feature-inventory)
+- [Technology stack](#technology-stack)
 - [Architecture](#architecture)
 - [Authentication and access](#authentication-and-access)
 - [Offboarding workflow](#offboarding-workflow)
@@ -54,6 +55,10 @@ The updated sign-in and administrator dashboard draw on the supplied visual refe
 | `auditor` | Directed to a read-only demo page; offboarding read endpoints allow this role within its organization. |
 
 The offboarding PATCH handler also lists `it` and `finance` as allowed roles, but the current `users.role` database constraint does not permit these values. Treat that mismatch as an unresolved implementation gap, not as working access. Client-side navigation is a convenience; API-side authorization is the security boundary. Static page files can be served before the JavaScript gate runs, so do not place confidential data in HTML, CSS or JavaScript assets.
+
+## Technology stack
+
+The application uses static HTML/CSS/browser JavaScript, Cloudflare Pages Functions, a D1 database, Web Crypto, and Node/npm-based Wrangler tooling. Some workflows use browser-local prototype state, not D1. Tool versions are not pinned in the current scripts. See the [stack inventory](docs/stack.md) for component purposes, file locations and limitations; [architecture](docs/architecture.md) for system and data flows; and [security documentation](docs/security.md) for controls, known defects and production prerequisites.
 
 ## Architecture
 
@@ -286,5 +291,7 @@ functions/api/             Pages Function endpoints
 migrations/                D1 schema migrations
 scripts/smoke-test.mjs     Static smoke checks
 wrangler.toml              Pages and D1 binding configuration
-docs/architecture.md       Supporting architecture notes
+docs/architecture.md       Architecture, flows and trust boundaries
+docs/stack.md              Technology inventory and runtime mapping
+docs/security.md           Security controls, risks and release gates
 ```
