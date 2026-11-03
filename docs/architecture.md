@@ -1,35 +1,53 @@
-# JelHR System – Architecture Notes
+# JelHR System architecture
 
-## Current State
+## Deployment boundary
 
-- Frontend-only React dashboard (self-contained artifact)
-- Mock data for employee profile, time tracking, onboarding tasks, security sessions
+The first Cloudflare release serves the current static multi-page experience from Workers Static Assets. The Worker runs first only for `/api/*`; all other requests are served as static assets.
 
-## Target Architecture (aligned with AI-API Store Hub)
+## Request flow
 
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant W as Cloudflare Worker
+  participant A as Static Assets
+  participant D as D1
+  B->>W: GET /api/health
+  W->>D: SELECT 1
+  D-->>W: Database result
+  W-->>B: Health JSON
+  B->>A: GET /index.html
+  A-->>B: HTML / CSS / JavaScript
 ```
-Browser (React Dashboard)
-        │
-        ▼
-Cloudflare Worker (Hono)
-  ├── Auth (JWT / session)
-  ├── Employees / Tenants (D1)
-  ├── Time Entries
-  ├── Onboarding Tasks
-  ├── Device / Session tracking
-  └── Optional: Workers for Platforms for multi-tenant isolation
+
+## Tenant model
+
+```mermaid
+erDiagram
+  ORGANIZATIONS ||--o{ USERS : contains
+  ORGANIZATIONS ||--o{ EMPLOYEES : employs
+  ORGANIZATIONS ||--o{ TIME_ENTRIES : records
+  ORGANIZATIONS ||--o{ ONBOARDING_TASKS : assigns
+  USERS ||--o{ SESSIONS : owns
+  USERS ||--o{ AUDIT_LOGS : performs
+  EMPLOYEES ||--o{ TIME_ENTRIES : logs
+  EMPLOYEES ||--o{ ONBOARDING_TASKS : completes
 ```
 
-## Suggested Tables (D1)
+Every future data query must derive `organization_id` from a verified session, never from an untrusted browser-supplied tenant header or request body. All write actions must create audit events in the same logical transaction/batch.
 
-- `tenants` / `organizations`
-- `employees` (profile, role, compensation, benefits)
-- `time_entries`
-- `onboarding_tasks`
-- `devices` / `sessions`
-- `documents` (policies, contracts)
+## Authentication plan before real HR data
 
-## Shared Patterns
+1. Invite-only organization owner bootstrap.
+2. Password hashing using a modern password KDF and constant-time verification.
+3. Opaque, random session tokens stored only as hashes; secure, HttpOnly, SameSite cookies.
+4. Session rotation, expiry, logout and revocation.
+5. Role-based access control with server-side permission checks.
+6. MFA and recovery controls before production onboarding.
+7. Rate limits and abuse monitoring for authentication routes.
 
-Reuse auth, API-key style tokens, and multi-tenant patterns from the sibling repo:
-[ai-api-store-hub](https://github.com/DevJel/ai-api-store-hub)
+No authentication endpoints are enabled in the current demo deployment.
+
+## Privacy
+
+Use synthetic demo data only. Production rollout requires a privacy notice, retention schedule, employee data access policy, export/deletion workflows, least-privilege roles, audit retention, incident response and verified backups.
