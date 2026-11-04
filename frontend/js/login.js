@@ -29,7 +29,7 @@ function loadTurnstile(siteKey){
   if(!window.turnstile){showError('Security verification could not initialize. Refresh and try again.');setTurnstileState(false,'Security check unavailable');return}
   try{
    turnstileWidget=window.turnstile.render('#turnstileWidget',{
-    sitekey:siteKey,theme:'auto',action:'login',
+    sitekey:siteKey,theme:'auto',action:'login',size:'flexible',
     callback:token=>{turnstileToken=token;showError('');setTurnstileState(true,'Continue')},
     'expired-callback':()=>{turnstileToken='';setTurnstileState(false,'Complete security check again')},
     'error-callback':()=>{turnstileToken='';setTurnstileState(false,'Security check unavailable');showError('Security verification could not load. Refresh and try again.')}
