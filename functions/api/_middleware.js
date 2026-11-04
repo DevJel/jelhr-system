@@ -11,6 +11,17 @@ const BIG_BODY = /^\/api\/(public\/jobs\/[^/]+\/apply|employees\/[^/]+\/document
 const COOKIELESS = new Set(["/api/auth/login", "/api/auth/bootstrap", "/api/health", "/api/platform/login", "/api/platform/logout", "/api/auth/mfa", "/api/auth/passkey", "/api/auth/invite"]);
 const isPublic = p => p.startsWith("/api/public/");
 
+function hardenResponse(response, requestId) {
+  const headers = new Headers(response.headers);
+  for (const [key, value] of Object.entries(BASE_HEADERS)) headers.set(key, value);
+  if (requestId) headers.set("X-Request-Id", requestId);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
 function sameOrigin(request) {
   const self = new URL(request.url).origin;
   const origin = request.headers.get("Origin");
@@ -43,14 +54,11 @@ export async function onRequest(context) {
       }
     }
     const response = await context.next();
-    const headers = new Headers(response.headers);
-    for (const [k, v] of Object.entries(BASE_HEADERS)) if (!headers.has(k)) headers.set(k, v);
-    headers.set("X-Request-Id", requestId);
-    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+    return hardenResponse(response, requestId);
   } catch (error) {
-    if (error instanceof ResponseError) return error.response;
-    if (error instanceof HttpError) return respond({ error: error.message, ...error.extra }, error.status);
+    if (error instanceof ResponseError) return hardenResponse(error.response, requestId);
+    if (error instanceof HttpError) return hardenResponse(respond({ error: error.message, ...error.extra }, error.status), requestId);
     console.error(JSON.stringify({ requestId, path: url.pathname, message: error?.message, stack: error?.stack?.slice(0, 800) }));
-    return respond({ error: "Something went wrong. Please try again.", requestId }, 500);
+    return hardenResponse(respond({ error: "Something went wrong. Please try again.", requestId }, 500), requestId);
   }
 }
