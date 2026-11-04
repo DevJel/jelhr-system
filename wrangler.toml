@@ -1,7 +1,7 @@
 # Cloudflare Pages project configuration. Keep this file as the source of truth for Pages Functions bindings.
 # Sensitive values belong in encrypted Pages secrets, never in this file.
 name = "jelhr-system"
-compatibility_date = "2026-11-05"
+compatibility_date = "2026-11-04"
 pages_build_output_dir = "./frontend"
 
 [vars]
