@@ -2,7 +2,8 @@ import { respond } from "../_shared/http.js";
 import { emailStatus } from "../_shared/email.js";
 import { platformConfigured } from "../_shared/platform.js";
 
-export const VERSION = "0.3.0";
+// API/schema release. The v0.4 frontend screens are still in progress.
+export const VERSION = "0.4.0";
 
 // Public health probe. Reports readiness only — never secrets or configuration values.
 export async function onRequestGet({ env }) {
