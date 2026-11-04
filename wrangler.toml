@@ -30,3 +30,7 @@ index_name = "jelhr-knowledge"
 [[services]]
 binding = "MAILER"
 service = "jelhr-mailer"
+
+[[services]]
+binding = "TURNSTILE_VERIFIER"
+service = "jelhr-turnstile-verifier"
