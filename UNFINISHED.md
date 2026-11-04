@@ -40,22 +40,16 @@ Migration `migrations/0004_recruitment_ai_auth.sql` (additive). Apply it **befor
 2. **Animations**: themed live loader (animated J mark), floating empty-state illustrations, sign-in progress, processing overlay, click ripple — all `prefers-reduced-motion` aware.
 3. **Seed + UI check + feature tour** for v0.4 screens.
 4. **Docs**: rewrite `DEPLOYMENT.md` as the single complete reference (all features, bindings `DB` / `AI` / `FILES` / `VECTORIZE`, every secret, migration order, processes), update README, SECURITY, API, RBAC, CHANGELOG.
-5. `wrangler.toml` additions to make when ready (shown below; commented so current deploys don't break):
+5. **Production bindings are now enabled** in `wrangler.toml`: D1 `DB`, Workers AI `AI`, R2 `FILES`, Vectorize `VECTORIZE`, and the internal SES service binding `MAILER`. See [DEPLOYMENT.md](DEPLOYMENT.md) for resource names, IDs, secret handling and preview isolation.
 
-```toml
-# [ai]
-# binding = "AI"
-# [[r2_buckets]]
-# binding = "FILES"
-# bucket_name = "jelhr-files"
-# [[vectorize]]
-# binding = "VECTORIZE"
-# index_name = "jelhr-knowledge"   # create with: npx wrangler vectorize create jelhr-knowledge --dimensions=768 --metric=cosine
-```
+Production secrets already configured: `JELHR_JWT_SECRET`, `JELHR_ENCRYPTION_KEY`. Still required for platform administration: `JELHR_SUPERADMIN_EMAIL`, `JELHR_SUPERADMIN_PASSWORD` (minimum 16 characters). Optional: `JELHR_SUPERADMIN_TOTP_SECRET`, `AI_API_BASE`, `AI_API_KEY`, `ANTHROPIC_API_KEY`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `JELHR_WEBAUTHN_RP_ID`, `JELHR_WEBAUTHN_ORIGINS`. Workers AI is configured by the `AI` binding and `AI_PROVIDER=workers-ai`.
 
-New secrets (all optional): `JELHR_ENCRYPTION_KEY`, `JELHR_SUPERADMIN_TOTP_SECRET`, `AI_PROVIDER`, `AI_API_BASE`, `AI_API_KEY`, `AI_MODEL`, `ANTHROPIC_API_KEY`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `JELHR_WEBAUTHN_RP_ID`, `JELHR_WEBAUTHN_ORIGINS`.
+## Production deployment status (2026-11-05)
 
-## Caution before deploying this snapshot
-
-- Don't merge to `main` until the frontend exists: the login API now returns `{mfaRequired}` steps that the current login page doesn't handle. MFA policy defaults to **off**, so password sign-in keeps working, but new features have no UI yet.
-- Apply migration 0004 first.
+- The v0.4 backend and migrations 0001–0004 are deployed to the Operava Business Cloudflare Pages project. Production bindings are documented in `DEPLOYMENT.md` and `wrangler.toml`: `DB`, `AI`, `FILES`, `VECTORIZE`, and `MAILER`.
+- The original Projects - Works Pages project and D1 database remain intact. Its GitHub source connection was disconnected so the repository could be connected to Operava Business.
+- The production health endpoint reports database connected, current schema, auth configured and email service binding configured. A real outbound SES message has not yet been sent as a smoke test.
+- `JELHR_SUPERADMIN_EMAIL` and `JELHR_SUPERADMIN_PASSWORD` are not configured yet; platform administration remains unavailable until these are added as encrypted Pages secrets.
+- Preview deployments are disabled until isolated preview D1 and storage resources are provisioned.
+- Do not enable MFA/passkey policy for users until the matching v0.4 login and security screens are built and tested. The current login UI is still v0.3 and does not handle the new `{mfaRequired}` flow.
+- Do not enter real employee or applicant data until the frontend, platform bootstrap, email smoke test, privacy review and full go-live checklist are complete.
