@@ -43,15 +43,17 @@ function loadTurnstile(siteKey){
  document.head.appendChild(script);
 }
 (async()=>{
+ const fallbackSiteKey='0x4AAAAAAFkWaPgHqafVv66D';
+ let siteKey=fallbackSiteKey;
  try{
   const r=await fetch('/api/auth/config',{credentials:'same-origin',cache:'no-store'});
   const d=await r.json().catch(()=>({}));
-  if(!r.ok||!d.turnstileSiteKey)throw new Error(d.error||'Security verification is not configured.');
-  loadTurnstile(d.turnstileSiteKey);
+  if(r.ok&&d.turnstileSiteKey)siteKey=d.turnstileSiteKey;
+  else console.warn('Using the configured public Turnstile site key fallback.');
  }catch(e){
-  showError(e.message||'Security verification is not configured. Please contact your administrator.');
-  setTurnstileState(false,'Security check unavailable');
+  console.warn('Turnstile config endpoint unavailable; using the public site key fallback.',e);
  }
+ loadTurnstile(siteKey);
 })();
 form.addEventListener('submit',async event=>{
  event.preventDefault();showError('');
