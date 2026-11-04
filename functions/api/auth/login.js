@@ -3,13 +3,12 @@ import { sha256b64, verifyPassword, dummyPasswordWork, randomToken } from "../..
 import { loadPolicy } from "../../_shared/authpolicy.js";
 import { findUser, MFA_CHALLENGE_MINUTES } from "../../_shared/login.js";
 import { issueOtp } from "../../_shared/otp.js";
-import { secret } from "../../_shared/secrets.js";
+
 
 const WINDOW_SECONDS=900, MAX_ATTEMPTS=8, ACCOUNT_LOCK_AFTER=10, ACCOUNT_LOCK_SECONDS=900;
-async function verifyTurnstile(env, token, ip) {
-  const key=await secret(env,"TURNSTILE_SECRET_KEY");
-  if(!key||!token)return false;
-  const r=await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({secret:String(key),response:String(token),remoteip:ip})});
+async function verifyTurnstile(env,token,ip) {
+  if(!env.TURNSTILE_VERIFIER||!token)return false;
+  const r=await env.TURNSTILE_VERIFIER.fetch("https://turnstile.internal/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,ip})});
   if(!r.ok)return false;
   return (await r.json().catch(()=>({}))).success===true;
 }
