@@ -65,8 +65,7 @@ AI output is advisory. It must be reviewed by an authorized human and must not a
 | Vanilla JavaScript (ES modules) | API client, session-aware page behavior, navigation, dialogs, forms and feature modules. |
 | Owned SVG icon sprite | Local interface icons and app icon assets. |
 | WebP / SVG assets | Optimized illustrations, branding and screenshots. |
-| Browser Web Crypto API | Cryptographic browser primitives where required by browser-side flows. |
-| Native browser APIs | Fetch, FormData, URL, storage and WebAuthn interfaces where supported. |
+| Native browser APIs | Fetch, FormData, URL, DOM, and browser credential interfaces where supported. |
 
 **No frontend framework is currently declared**: the application does not declare React, Vue, Angular, Svelte, Next.js or a bundler as a runtime dependency. The current UI is static HTML/CSS/JavaScript. The v0.4 frontend pages are still pending.
 
@@ -368,12 +367,12 @@ Do not enable a feature simply because optional configuration names exist in cod
 | Design system | `frontend/css/app.css` | Theme variables, layout, typography, controls, tables and responsive styles. |
 | App bootstrap | `frontend/js/app.js` | Application initialization and shared page startup. |
 | Navigation | `frontend/js/nav.js` | Navigation and application shell behavior. |
-| API/session client | `frontend/js/core.js` (shared page module where referenced) | API requests, authentication gate, dialogs, tabs, toasts and UI state. |
+| Shared app behavior | `frontend/js/app.js`, `nav.js` and the page scripts | Shared page initialization, navigation and common client behavior. |
 | Login | `frontend/js/login.js` | Existing sign-in interface. |
 | Dashboard | `frontend/js/dashboard.js` | Dashboard behavior and summary rendering. |
-| Page modules | `frontend/js/pages/*.js` when present | Feature-specific UI logic. |
+| Page scripts | `frontend/js/*.js` | Login, dashboard, app bootstrap and navigation behavior. |
 | Security headers | `frontend/_headers` | CSP and browser security headers. |
-| Routing rules | `frontend/_redirects` when present | Static redirects and route behavior. |
+
 
 The current repository tree is authoritative. The v0.4 backend endpoints do not imply that a matching v0.4 frontend screen already exists.
 
@@ -659,11 +658,9 @@ jelhr-system/
 │   │   └── bolek.css              # Additional stylesheet (legacy/feature-specific)
 │   ├── js/
 │   │   ├── app.js                 # App bootstrap
-│   │   ├── core.js                # Shared client utilities (where imported)
 │   │   ├── dashboard.js           # Dashboard behavior
 │   │   ├── login.js               # Login page behavior
-│   │   ├── nav.js                 # Navigation behavior
-│   │   └── pages/                 # Feature page modules, when present
+│   │   └── nav.js                 # Navigation behavior
 │   ├── assets/                    # SVG icon sprite, WebP and image assets
 │   └── _headers                   # Security headers / CSP
 ├── functions/
