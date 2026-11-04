@@ -4,7 +4,7 @@ A multi-tenant HR workspace on **Cloudflare Pages + Pages Functions + D1**: peop
 
 ![JelHR](frontend/assets/img/og-image.png)
 
-> **Release status — v0.3.0.** Code, schema and tests are complete for the features below. Before entering real employee data, finish the [go-live checklist](DEPLOYMENT.md#go-live-checklist): set the production secrets, apply migration `0003`, provision the first organization, configure email, and run the smoke checks. Have the e-signature wording and retention settings reviewed for your jurisdiction.
+> **Release status — v0.4 backend deployed; frontend pending.** The Operava Business Pages deployment uses the v0.4 D1 schema (migrations 0001–0004), D1, R2, Workers AI, Vectorize and the internal SES mailer binding. The existing browser UI is still v0.3; the new recruitment, careers, MFA/passkey, SSO and AI screens are not finished. Do not enter real employee/applicant data until the [go-live checklist](DEPLOYMENT.md#release-status-and-go-live-checklist) is complete.
 
 ## What's included
 
@@ -15,7 +15,7 @@ A multi-tenant HR workspace on **Cloudflare Pages + Pages Functions + D1**: peop
 | **People** | Tabs for **Directory**, **Applicants** and **Former employees**. Create/edit employees, managers, departments, CSV export (formula-injection safe), create sign-ins linked to employees. |
 | **Offboarding** | Case tabs (In progress / Awaiting approval / Completed / Cancelled). Case detail tabs: **Checklist** (12 dated tasks with evidence notes), **Assets** (return / lost / write-off), **Exit interview & final pay**, **Documents**, **Activity**. Submit → admin finalization (type-to-confirm), blocked until tasks, assets, final pay and signatures are resolved. Finalizing terminates the employee, disables the login and revokes sessions in one batch. |
 | **E-signatures** | Templates (separation acknowledgement, property return, confidentiality, policy, custom) with placeholders. Draw or type a signature, explicit consent, SHA-256 document fingerprint echoed back on signing, tamper detection, decline / void / remind, signing certificate with audit trail, print-to-PDF, fingerprint verification. |
-| **Communications** | Compose to all employees, a department, selected people, applicants (by stage, consent required) or former employees (personal email, opt-out honoured). Live recipient count, merge fields, preview, yes/no confirmation, batched sending with progress, per-recipient delivery status, retry failed, cancel, drafts. **Amazon SES** (SigV4 HTTPS API) or **SMTP** (incl. SES SMTP) over Cloudflare TCP sockets. |
+| **Communications** | Compose to all employees, a department, selected people, applicants (by stage, consent required) or former employees (personal email, opt-out honoured). Live recipient count, merge fields, preview, yes/no confirmation, batched sending with progress, per-recipient delivery status, retry failed, cancel, drafts. **Amazon SES SMTP** through the internal `jelhr-mailer` Worker, which reads the shared Operava Secrets Store credentials. |
 | **Time & onboarding** | Clock in/out with live timer and weekly chart, manager/HR approvals. Standard 9-step onboarding plan, custom tasks, progress rings. |
 | **Security** | Tabs for password, own sessions, users & access, org sessions, audit log. Forced password change for temporary passwords. |
 | **UX** | Owned SVG icon set (55 icons), favicon + app icons + manifest, original WebP illustrations, skeleton loading, error states with retry, toasts, offline notice, accessible tabs (keyboard arrows, hash-synced), yes/no confirmations for every destructive action, reduced-motion support, responsive tables, strict CSP. |
@@ -33,7 +33,7 @@ Seeded accounts (password `Correct-Horse-Battery-9`): `owner@northwind.test`, `k
 
 ## Deploy
 
-GitHub `DevJel/jelhr-system` → Cloudflare Pages project `jelhr-system` (`main` deploys production). **Apply D1 migrations before merging** code that needs them. Full steps, secrets, email setup, rollback and backups: **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+GitHub `DevJel/jelhr-system` → Cloudflare Pages project `jelhr-system` in Jelvan - Business - Operava (`main` deploys production at [jelhr-system-213.pages.dev](https://jelhr-system-213.pages.dev)). Preview deployments are disabled until isolated preview resources are available. Production bindings and migration history are documented in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
 ## Documentation
 
@@ -63,7 +63,7 @@ frontend/                 Static app (Pages output)
 functions/
   _shared/                Auth, crypto, validation, email (SES/SMTP), e-sign helpers
   api/                    Pages Functions routes (+ _middleware.js, [[path]].js)
-migrations/               D1 schema (0001–0003, additive)
+migrations/               D1 schema (0001–0004, additive)
 scripts/                  Offline dev server, D1 shim, seed, UI check, image generator
 tests/                    node:test integration + static suites
 design/illustrations/     SVG sources for the WebP illustrations
