@@ -11,6 +11,7 @@
       <stop offset="1" stop-color="#F26A21"/>
     </linearGradient>
   </defs>
+  <rect x="0" y="0" width="960" height="260" rx="38" fill="#FFFFFF"/>
   <rect x="10" y="10" width="240" height="240" rx="58" fill="#171923"/>
   <path d="M131 62v103c0 28-17 45-44 45-15 0-29-6-40-17l24-25c5 5 10 8 16 8 9 0 14-6 14-16V62z" fill="url(#mark)"/>
   <circle cx="177" cy="86" r="22" fill="url(#accent)"/>
