@@ -42,14 +42,14 @@ Migration `migrations/0004_recruitment_ai_auth.sql` (additive). Apply it **befor
 4. **Docs**: rewrite `DEPLOYMENT.md` as the single complete reference (all features, bindings `DB` / `AI` / `FILES` / `VECTORIZE`, every secret, migration order, processes), update README, SECURITY, API, RBAC, CHANGELOG.
 5. **Production bindings are now enabled** in `wrangler.toml`: D1 `DB`, Workers AI `AI`, R2 `FILES`, Vectorize `VECTORIZE`, and the internal SES service binding `MAILER`. See [DEPLOYMENT.md](DEPLOYMENT.md) for resource names, IDs, secret handling and preview isolation.
 
-Production secrets already configured: `JELHR_JWT_SECRET`, `JELHR_ENCRYPTION_KEY`. Still required for platform administration: `JELHR_SUPERADMIN_EMAIL`, `JELHR_SUPERADMIN_PASSWORD` (minimum 16 characters). Optional: `JELHR_SUPERADMIN_TOTP_SECRET`, `AI_API_BASE`, `AI_API_KEY`, `ANTHROPIC_API_KEY`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `JELHR_WEBAUTHN_RP_ID`, `JELHR_WEBAUTHN_ORIGINS`. Workers AI is configured by the `AI` binding and `AI_PROVIDER=workers-ai`.
+Cloudflare Pages configuration lists encrypted secret entries for `JELHR_JWT_SECRET`, `JELHR_ENCRYPTION_KEY`, `JELHR_SUPERADMIN_EMAIL` and `JELHR_SUPERADMIN_PASSWORD` (minimum 16 characters). Values are write-only and are never stored in Git. The latest health endpoint still reports `platformAdmin: false`, so verify the bootstrap credentials and redeploy before considering platform administration initialized. Optional: `JELHR_SUPERADMIN_TOTP_SECRET`, `AI_API_BASE`, `AI_API_KEY`, `ANTHROPIC_API_KEY`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `JELHR_WEBAUTHN_RP_ID`, `JELHR_WEBAUTHN_ORIGINS`. Workers AI is configured by the `AI` binding and `AI_PROVIDER=workers-ai`.
 
 ## Production deployment status (2026-11-05)
 
 - The v0.4 backend and migrations 0001–0004 are deployed to the Operava Business Cloudflare Pages project. Production bindings are documented in `DEPLOYMENT.md` and `wrangler.toml`: `DB`, `AI`, `FILES`, `VECTORIZE`, and `MAILER`.
 - The original Projects - Works Pages project and D1 database remain intact. Its GitHub source connection was disconnected so the repository could be connected to Operava Business.
 - The production health endpoint reports database connected, current schema, auth configured and email service binding configured. A real outbound SES message has not yet been sent as a smoke test.
-- `JELHR_SUPERADMIN_EMAIL` and `JELHR_SUPERADMIN_PASSWORD` are not configured yet; platform administration remains unavailable until these are added as encrypted Pages secrets.
+- Cloudflare confirms the mailer Worker has all four SES SMTP secret references attached from the shared Secrets Store: host, port, username and password. The production Pages project also lists the encrypted super-admin secret entries, but the live health field remains `platformAdmin: false`; bootstrap is not yet confirmed.
 - Preview deployments are disabled until isolated preview D1 and storage resources are provisioned.
 - Do not enable MFA/passkey policy for users until the matching v0.4 login and security screens are built and tested. The current login UI is still v0.3 and does not handle the new `{mfaRequired}` flow.
 - Do not enter real employee or applicant data until the frontend, platform bootstrap, email smoke test, privacy review and full go-live checklist are complete.
