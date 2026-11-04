@@ -8,6 +8,7 @@ pages_build_output_dir = "./frontend"
 JELHR_ENV = "production"
 AI_PROVIDER = "workers-ai"
 AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+EMAIL_FROM = "noreply@operavaglobal.com"
 
 [[d1_databases]]
 binding = "DB"
