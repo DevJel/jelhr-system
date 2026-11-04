@@ -1,7 +1,8 @@
 import { respond } from "../../_shared/http.js";
-// The site key is public and is configured as a Pages production variable.
+// Site keys are public. The fallback keeps the login widget renderable if a Pages
+// environment variable is temporarily unavailable during a production rollout.
+const FALLBACK_SITE_KEY = "0x4AAAAAAFkWaPgHqafVv66D";
 export async function onRequestGet({env}) {
-  const siteKey=String(env.TURNSTILE_SITE_KEY||"");
-  if(!siteKey)return respond({error:"Security verification is not configured."},503);
+  const siteKey=String(env.TURNSTILE_SITE_KEY||FALLBACK_SITE_KEY);
   return respond({turnstileSiteKey:siteKey});
 }
