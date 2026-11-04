@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="260" viewBox="0 0 960 260" role="img" aria-labelledby="title desc">
+  <title id="title">JelHR</title>
+  <desc id="desc">JelHR human resources information system logo, with a violet and orange people-inspired mark.</desc>
+  <defs>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6D4AFF"/>
+      <stop offset="1" stop-color="#9A5BFF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF9A3D"/>
+      <stop offset="1" stop-color="#F26A21"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="240" height="240" rx="58" fill="#171923"/>
+  <path d="M131 62v103c0 28-17 45-44 45-15 0-29-6-40-17l24-25c5 5 10 8 16 8 9 0 14-6 14-16V62z" fill="url(#mark)"/>
+  <circle cx="177" cy="86" r="22" fill="url(#accent)"/>
+  <circle cx="192" cy="143" r="15" fill="#FFFFFF" opacity=".96"/>
+  <path d="M164 177c13-16 31-16 45 0v18h-45z" fill="url(#accent)"/>
+  <text x="292" y="139" fill="#202230" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="100" font-weight="750" letter-spacing="-5">JelHR</text>
+  <rect x="298" y="164" width="96" height="7" rx="3.5" fill="url(#accent)"/>
+  <text x="298" y="213" fill="#626575" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="25" font-weight="600" letter-spacing="3">HUMAN RESOURCES, END TO END</text>
+</svg>
