@@ -1,24 +1,27 @@
-# Cloudflare Pages project configuration (Pages reads this file on Git-triggered builds).
-# Secrets are NOT stored here — set them with `wrangler pages secret put` or the dashboard.
+# Cloudflare Pages project configuration. Keep this file as the source of truth for Pages Functions bindings.
+# Sensitive values belong in encrypted Pages secrets, never in this file.
 name = "jelhr-system"
-compatibility_date = "2026-11-03"
+compatibility_date = "2026-11-05"
 pages_build_output_dir = "./frontend"
 
 [vars]
 JELHR_ENV = "production"
+AI_PROVIDER = "workers-ai"
+AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "jelhr-system-db"
-database_id = "99699f6d-e0e8-4e1c-a161-80dd698761d9"
+database_id = "65b599fb-e45d-4f92-8588-d353df0e1cb8"
 migrations_dir = "migrations"
 
-# Optional bindings for v0.4 (see UNFINISHED.md / DEPLOYMENT.md):
-# [ai]
-# binding = "AI"
-# [[r2_buckets]]
-# binding = "FILES"
-# bucket_name = "jelhr-files"
-# [[vectorize]]
-# binding = "VECTORIZE"
-# index_name = "jelhr-knowledge"
+[ai]
+binding = "AI"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "jelhr-files"
+
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "jelhr-knowledge"
