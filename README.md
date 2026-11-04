@@ -5,7 +5,7 @@
 The production deployment is hosted on **Cloudflare Pages in the Jelvan - Business - Operava account**. Its server-side API runs on Pages Functions, with Cloudflare D1 as the relational system of record, R2 for private file objects, Workers AI for assisted HR workflows, Vectorize for optional semantic retrieval, and an internal Worker service binding for AWS SES email delivery.
 
 <p align="center">
-  <img src="docs/jelhr-logo.svg" alt="JelHR — Human Resources, End to End" width="520" />
+  <img src="functions/api/public/jelhr_circled_logo.png" alt="JelHR circled logo" width="240" />
 </p>
 
 <p align="center">
@@ -880,7 +880,7 @@ Track remaining implementation work in [UNFINISHED.md](UNFINISHED.md).
 
 ## Visual assets
 
-The README uses the repository-owned vector logo at [docs/jelhr-logo.svg](docs/jelhr-logo.svg). The technology badges above are rendered as hosted SVG badges and do not depend on local image folders. The architecture diagrams throughout this document are Mermaid source, so they remain readable and editable in GitHub.
+The README uses the application’s canonical circled PNG logo at [functions/api/public/jelhr_circled_logo.png](functions/api/public/jelhr_circled_logo.png). The technology badges above are rendered as hosted SVG badges and do not depend on local image folders. The architecture diagrams throughout this document are Mermaid source, so they remain readable and editable in GitHub.
 
 No application screenshot files are currently committed. Screenshot placeholders have intentionally been removed until real, current UI captures are added to the repository.
 
