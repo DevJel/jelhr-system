@@ -25,7 +25,7 @@ The production deployment is hosted on **Cloudflare Pages in the Jelvan - Busine
 </p>
 
 > [!IMPORTANT]
-> **Release boundary — v0.4 backend deployed; v0.3 frontend still active.** The v0.4 backend APIs and database migrations (0001–0004) are deployed and the production health endpoint reports all configured infrastructure bindings ready. The current browser interface is still the v0.3 UI. The new recruitment/careers, MFA/passkey, SSO, invitation acceptance and AI knowledge screens are not complete. Platform super-admin bootstrap secrets are also not configured, and outbound SES delivery still needs a controlled end-to-end test. Keep the application on synthetic data until the [production go-live checklist](DEPLOYMENT.md#release-status-and-go-live-checklist) is complete.
+> **Release boundary — v0.4 backend deployed; v0.3 frontend still active.** The v0.4 backend APIs and database migrations (0001–0004) are deployed and the production health endpoint reports all configured infrastructure bindings ready. The current browser interface is still the v0.3 UI. The new recruitment/careers, MFA/passkey, SSO, invitation acceptance and AI knowledge screens are not complete. Platform administration is not yet initialized (`platformAdmin: false` on the latest health check), and outbound SES delivery still needs a controlled end-to-end test. Keep the application on synthetic data until the [production go-live checklist](DEPLOYMENT.md#release-status-and-go-live-checklist) is complete.
 
 ---
 
@@ -48,6 +48,7 @@ The production deployment is hosted on **Cloudflare Pages in the Jelvan - Busine
 - [Local development and testing](#local-development-and-testing)
 - [Deployment and migration workflow](#deployment-and-migration-workflow)
 - [Security and operational practices](#security-and-operational-practices)
+- [Response security headers](#response-security-headers)
 - [Current release limitations](#current-release-limitations)
 - [Related documentation](#related-documentation)
 
@@ -347,20 +348,20 @@ These values are represented in `wrangler.toml` and/or the Pages deployment conf
 |---|---|---|
 | `JELHR_JWT_SECRET` | Session signing and OTP HMAC key material. | Configured |
 | `JELHR_ENCRYPTION_KEY` | AES-GCM key material for encrypted SSO/TOTP values. | Configured |
-| `JELHR_SUPERADMIN_EMAIL` | Platform super-admin identity. | **Required — not configured** |
-| `JELHR_SUPERADMIN_PASSWORD` | Platform super-admin password; minimum 16 characters. | **Required — not configured** |
+| `JELHR_SUPERADMIN_EMAIL` | Platform super-admin identity. | Encrypted secret entry is present in Pages configuration; bootstrap is not yet confirmed. |
+| `JELHR_SUPERADMIN_PASSWORD` | Platform super-admin password; minimum 16 characters. | Encrypted secret entry is present in Pages configuration; bootstrap is not yet confirmed. |
 | `JELHR_SUPERADMIN_TOTP_SECRET` | Optional platform-admin TOTP factor. | Optional |
 
 ### Shared Cloudflare Secrets Store values
 
-The internal `jelhr-mailer` Worker is configured to bind the following existing secret names from the Operava Secrets Store:
+The internal `jelhr-mailer` Worker has all four SMTP credential references attached as `secrets_store_secret` bindings to the Operava Secrets Store:
 
 - `SES_SMTP_HOST`
 - `SES_SMTP_PORT`
 - `SES_SMTP_USERNAME`
 - `SES_SMTP_PASSWORD`
 
-Secret values must never be printed in logs, committed to Git, added to `wrangler.toml`, copied into README files or exposed through the health endpoint.
+Cloudflare configuration confirms that the Worker references all four names above. The same store also lists `SES_SMTP_REGION`; it is not currently part of the Worker binding list. Secret values must never be printed in logs, committed to Git, added to `wrangler.toml`, copied into README files or exposed through the health endpoint.
 
 ### Optional feature secrets
 
@@ -389,7 +390,8 @@ Do not enable a feature simply because optional configuration names exist in cod
 | Login | `frontend/js/login.js` | Existing sign-in interface. |
 | Dashboard | `frontend/js/dashboard.js` | Dashboard behavior and summary rendering. |
 | Page scripts | `frontend/js/*.js` | Login, dashboard, app bootstrap and navigation behavior. |
-| Security headers | `frontend/_headers` | CSP and browser security headers. |
+| Static response headers | `frontend/_headers` | Security headers for static Pages assets and documents. |
+| Function response headers | `functions/_shared/http.js`, `functions/api/_middleware.js` | The same policy for API and Pages Function responses, including generated errors. |
 
 
 The current repository tree is authoritative. The v0.4 backend endpoints do not imply that a matching v0.4 frontend screen already exists.
@@ -826,6 +828,21 @@ For exact resource IDs, migration history, preserved legacy resources, secrets a
 - Back up D1 before migrations and retain a tested rollback/recovery plan.
 - Review privacy notice, retention, employee access/export/deletion, incident response and jurisdiction-specific employment requirements before go-live.
 
+### Response security headers
+
+The static Pages site uses `frontend/_headers`. Pages Functions do not inherit `_headers` rules, so API responses apply the same policy from `functions/_shared/http.js` and `functions/api/_middleware.js`, including generated error responses.
+
+| Header | Production policy |
+|---|---|
+| `X-Frame-Options` | `DENY` |
+| `X-Content-Type-Options` | `nosniff` |
+| `Referrer-Policy` | `no-referrer` |
+| `Cache-Control` | `no-store, no-cache, must-revalidate` |
+| `Permissions-Policy` | `geolocation=(), microphone=(), camera=()` |
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains; preload` |
+
+The no-store policy is intentional for an HR application that can display employee and applicant information. It also disables normal browser caching for static assets.
+
 See [SECURITY.md](SECURITY.md) for the threat model and known limitations.
 
 ---
@@ -835,7 +852,7 @@ See [SECURITY.md](SECURITY.md) for the threat model and known limitations.
 The current production deployment is infrastructure-ready at the health-check level, but it is **not yet the completed v0.4 HR product**.
 
 1. The browser interface is still v0.3; v0.4 recruitment, careers, invitation acceptance, MFA/passkey, SSO, AI assistant and knowledge screens remain to be implemented.
-2. Platform super-admin bootstrap secrets `JELHR_SUPERADMIN_EMAIL` and `JELHR_SUPERADMIN_PASSWORD` are not configured.
+2. Platform super-admin bootstrap is not initialized: the latest production health response reports `platformAdmin: false`. Although encrypted secret entries appear in Pages configuration, their values are write-only and bootstrap must be verified after redeployment.
 3. SES delivery is configured through the mailer binding but has not yet passed a controlled end-to-end send/receive test.
 4. R2 upload/download, Workers AI inference and organization-scoped Vectorize retrieval still require feature-level smoke tests.
 5. Privacy, retention, legal review, backup and rollback procedures must be signed off before real employee/applicant data is entered.
