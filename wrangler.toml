@@ -25,3 +25,7 @@ bucket_name = "jelhr-files"
 [[vectorize]]
 binding = "VECTORIZE"
 index_name = "jelhr-knowledge"
+
+[[services]]
+binding = "MAILER"
+service = "jelhr-mailer"
