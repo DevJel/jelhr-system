@@ -1,17 +1,22 @@
 {
   "name": "jelhr-system",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
-  "description": "JelHR multi-page HR workspace demo and Cloudflare Pages foundation",
+  "type": "module",
+  "description": "JelHR — multi-tenant HR workspace on Cloudflare Pages, Pages Functions and D1",
+  "engines": { "node": ">=22.5" },
   "scripts": {
     "dev": "npx wrangler@latest pages dev frontend",
-    "preview": "npx serve frontend -p 3000",
+    "dev:offline": "node --no-warnings scripts/dev-server.mjs --seed",
+    "test": "node --no-warnings --test tests/*.test.mjs",
+    "test:ui": "node scripts/ui-check.mjs ui-check",
+    "images": "python3 scripts/generate-images.py",
     "deploy": "npx wrangler@latest pages deploy frontend --project-name=jelhr-system",
     "db:migrate:local": "npx wrangler@latest d1 migrations apply jelhr-system-db --local",
     "db:migrate:remote": "npx wrangler@latest d1 migrations apply jelhr-system-db --remote",
-    "test": "node scripts/smoke-test.mjs"
+    "db:migrations:list": "npx wrangler@latest d1 migrations list jelhr-system-db --remote"
   },
-  "keywords": ["hr", "dashboard", "employee", "time-tracking", "onboarding", "cloudflare", "d1"],
+  "keywords": ["hr", "hris", "offboarding", "e-signature", "cloudflare", "d1", "multi-tenant"],
   "author": "DevJel",
   "license": "MIT"
 }

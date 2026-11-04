@@ -1,19 +1,23 @@
+import { respond } from "../_shared/http.js";
+import { emailStatus } from "../_shared/email.js";
+import { platformConfigured } from "../_shared/platform.js";
+
+export const VERSION = "0.3.0";
+
+// Public health probe. Reports readiness only — never secrets or configuration values.
 export async function onRequestGet({ env }) {
   let database = "unavailable";
-  try {
-    await env.DB.prepare("SELECT 1 AS ok").first();
-    database = "connected";
-  } catch {
-    return Response.json({ service: "JelHR System", status: "degraded", database }, {
-      status: 503,
-      headers: { "Cache-Control": "no-store" }
-    });
+  try { await env.DB.prepare("SELECT 1 AS ok").first(); database = "connected"; } catch {}
+  let schema = "unknown";
+  if (database === "connected") {
+    try { await env.DB.prepare("SELECT 1 FROM signature_requests LIMIT 1").all(); schema = "current"; } catch { schema = "migration_required"; }
   }
-  return Response.json({
-    service: "JelHR System",
-    status: "ok",
-    database,
-    mode: "interactive-demo",
+  const ok = database === "connected" && schema === "current";
+  return respond({
+    service: "JelHR System", version: VERSION, status: ok ? "ok" : "degraded", database, schema,
+    auth: Boolean(env.JELHR_JWT_SECRET && env.JELHR_JWT_SECRET.length >= 32),
+    platformAdmin: platformConfigured(env),
+    email: emailStatus(env).configured,
     timestamp: new Date().toISOString()
-  }, { headers: { "Cache-Control": "no-store" } });
+  }, ok ? 200 : 503);
 }

@@ -1,5 +1,19 @@
-const enc=new TextEncoder();
-const decode=s=>Uint8Array.from(atob(s.replace(/-/g,"+").replace(/_/g,"/")+"=".repeat((4-s.length%4)%4)),c=>c.charCodeAt(0));
-const json=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
-async function verify(token,secret){try{const [h,p,s]=token.split(".");const key=await crypto.subtle.importKey("raw",enc.encode(secret),{name:"HMAC",hash:"SHA-256"},false,["verify"]);if(!await crypto.subtle.verify("HMAC",key,decode(s),enc.encode(h+"."+p)))return null;const payload=JSON.parse(new TextDecoder().decode(decode(p)));return payload.exp>Date.now()/1000?payload:null}catch{return null}}
-export async function onRequestGet({request,env}){const token=(request.headers.get("Cookie")||"").split(";").map(x=>x.trim()).find(x=>x.startsWith("jelhr_session="))?.slice(14);if(!token||!env.JELHR_JWT_SECRET)return json({authenticated:false},401);const p=await verify(token,env.JELHR_JWT_SECRET);if(!p)return json({authenticated:false},401);const s=await env.DB.prepare("SELECT id FROM sessions WHERE id=? AND user_id=? AND revoked_at IS NULL AND expires_at>?").bind(p.sid,p.sub,new Date().toISOString()).first();if(!s)return json({authenticated:false},401);const u=await env.DB.prepare("SELECT id,email,display_name,role,organization_id FROM users WHERE id=? AND status='active'").bind(p.sub).first();if(!u)return json({authenticated:false},401);return json({authenticated:true,user:{id:u.id,email:u.email,name:u.display_name,role:u.role,organizationId:u.organization_id}})}
+import { respond } from "../../_shared/http.js";
+import { requireUser, publicUser } from "../../_shared/auth.js";
+
+export async function onRequestGet({ request, env }) {
+  const auth = await requireUser(request, env, [], { allowPasswordChange: true });
+  if (auth.error) {
+    const status = auth.error.status;
+    const body = await auth.error.json().catch(() => ({}));
+    return respond({ authenticated: false, ...body }, status);
+  }
+  const user = auth.user;
+  let employee = null;
+  if (user.employee_id) {
+    employee = await env.DB.prepare(
+      "SELECT id, employee_number, first_name, last_name, email, job_title, department, employment_status, hire_date FROM employees WHERE id=?"
+    ).bind(user.employee_id).first();
+  }
+  return respond({ authenticated: true, user: publicUser(user), employee });
+}
