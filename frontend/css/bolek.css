@@ -7,3 +7,13 @@ body.auth-page{display:flow-root;min-height:100dvh}body.auth-page *,body.dashboa
 @media(max-height:620px){.auth-frame{height:auto;min-height:100dvh;overflow:visible}.auth-content{min-height:calc(100dvh - 36px)}.auth-center .intro{margin-bottom:8px}.auth-center label{margin-top:8px}.auth-center input{height:46px}.auth-center button{height:46px;margin-top:12px}.dashboard-frame{gap:8px;padding:10px}.dashboard-main{gap:8px}.dashboard-main .eyebrow{margin-bottom:3px}.welcome h1{font-size:28px}.welcome p:not(.eyebrow){font-size:12px;margin-top:3px}.dashboard-switch button{min-height:36px}.dash-card{padding:14px;border-radius:24px}.dash-card h2{font-size:24px}.dash-card .strip,.dash-card .yellow-strip{margin:8px 0}.strip span,.yellow-strip span{padding:9px}.intro-card>p:not(.eyebrow){margin:7px 0;font-size:13px}.intro-card>small{margin-top:6px}.card-links a,.action-list a{padding:8px 0}.dark-box{padding:12px;border-radius:22px}.dark-box h3{font-size:18px;margin-bottom:0}.dark-box a{padding:5px 0}.dark-box small{font-size:11px;margin-top:2px}.timer-dial{min-width:100px;min-height:100px;width:18vh;height:18vh}.timer-dial strong{font-size:24px}}
 
 .welcome .user-meta{font-size:inherit}.welcome .user-meta .name{font-weight:inherit}
+
+
+/* JelHR login photography: keep the team image visible on narrow screens. */
+@media(max-width:760px){
+  .auth-frame{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(140px,25dvh) minmax(0,1fr);overflow:auto}
+  .auth-visual{display:block;order:-1;min-height:140px;border-radius:24px}
+  .auth-content{order:1}
+  .visual-label{top:12px;left:12px;padding:9px 12px}
+  .visual-card{bottom:10px;left:12px;right:12px;min-width:0;padding:11px 14px}
+}
