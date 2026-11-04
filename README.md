@@ -681,7 +681,7 @@ jelhr-system/
 │   │   ├── dashboard.js           # Dashboard behavior
 │   │   ├── login.js               # Login page behavior
 │   │   └── nav.js                 # Navigation behavior
-│   └── _headers                   # Security headers / CSP
+│   └── _headers                   # Static response security headers
 ├── functions/
 │   ├── api/
 │   │   ├── [[path]].js            # API catch-all router
@@ -803,7 +803,7 @@ The live endpoint is `GET /api/health`. The current verified production response
 - `fileStorage: "r2"`
 - `vectorize: true`
 - `mailer: true`
-- `platformAdmin: false` until platform bootstrap secrets are configured.
+- `platformAdmin: false` (latest observed production status; platform bootstrap is not yet verified).
 
 A readiness flag confirms configuration/binding presence; it does not prove a real external provider transaction. In particular, `email: true` does not mean an SES test message has been delivered.
 
