@@ -6,6 +6,12 @@ import { signV4 } from "./sigv4.js";
 import { smtpSend } from "./smtp.js";
 
 export function emailStatus(env) {
+  // Pages Functions use an internal service binding for the shared AWS SES SMTP
+  // credentials held in Cloudflare Secrets Store (Pages cannot bind Secrets Store directly).
+  if (env.MAILER && typeof env.MAILER.fetch === "function") {
+    const from = env.EMAIL_FROM || "";
+    return { provider: "mailer-service", configured: Boolean(from), from: from || null, detail: from ? "Amazon SES via internal mailer service" : "Set EMAIL_FROM" };
+  }
   const provider = String(env.EMAIL_PROVIDER || "").toLowerCase();
   const from = env.EMAIL_FROM || "";
   if (provider === "ses") {
@@ -71,7 +77,19 @@ export async function sendEmail(env, msg) {
   const message = { ...msg, from: status.from, messageId: `${crypto.randomUUID()}@jelhr` };
   try {
     let result;
-    if (status.provider === "ses") result = await sendSes(env, message);
+    if (status.provider === "mailer-service") {
+      const response = await env.MAILER.fetch(new Request("https://jelhr-mailer.internal/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: message.to, toName: message.toName, subject: message.subject,
+          text: message.text, html: message.html, fromName: message.fromName, replyTo: message.replyTo
+        })
+      }));
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.error || `Mailer service returned ${response.status}`);
+      result = { id: data.id || null };
+    } else if (status.provider === "ses") result = await sendSes(env, message);
     else if (status.provider === "smtp") {
       result = await smtpSend({
         host: env.SMTP_HOST, port: env.SMTP_PORT, secure: env.SMTP_SECURE, username: env.SMTP_USERNAME, password: env.SMTP_PASSWORD
