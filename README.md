@@ -4,7 +4,25 @@
 
 The production deployment is hosted on **Cloudflare Pages in the Jelvan - Business - Operava account**. Its server-side API runs on Pages Functions, with Cloudflare D1 as the relational system of record, R2 for private file objects, Workers AI for assisted HR workflows, Vectorize for optional semantic retrieval, and an internal Worker service binding for AWS SES email delivery.
 
-![JelHR](frontend/assets/img/og-image.png)
+<p align="center">
+  <img src="docs/jelhr-logo.svg" alt="JelHR — Human Resources, End to End" width="520" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Cloudflare_Pages-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare Pages" />
+  <img src="https://img.shields.io/badge/Cloudflare_D1-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare D1" />
+  <img src="https://img.shields.io/badge/Cloudflare_R2-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare R2" />
+  <img src="https://img.shields.io/badge/Workers_AI-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare Workers AI" />
+  <img src="https://img.shields.io/badge/Vectorize-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare Vectorize" />
+</p>
+<p align="center">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=222222" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Amazon_SES-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white" alt="Amazon SES" />
+  <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />
+</p>
 
 > [!IMPORTANT]
 > **Release boundary — v0.4 backend deployed; v0.3 frontend still active.** The v0.4 backend APIs and database migrations (0001–0004) are deployed and the production health endpoint reports all configured infrastructure bindings ready. The current browser interface is still the v0.3 UI. The new recruitment/careers, MFA/passkey, SSO, invitation acceptance and AI knowledge screens are not complete. Platform super-admin bootstrap secrets are also not configured, and outbound SES delivery still needs a controlled end-to-end test. Keep the application on synthetic data until the [production go-live checklist](DEPLOYMENT.md#release-status-and-go-live-checklist) is complete.
@@ -661,7 +679,6 @@ jelhr-system/
 │   │   ├── dashboard.js           # Dashboard behavior
 │   │   ├── login.js               # Login page behavior
 │   │   └── nav.js                 # Navigation behavior
-│   ├── assets/                    # SVG icon sprite, WebP and image assets
 │   └── _headers                   # Security headers / CSP
 ├── functions/
 │   ├── api/
@@ -689,8 +706,9 @@ jelhr-system/
 │   ├── ui-check.mjs               # UI checks and screenshots
 │   └── generate-images.py         # Image generation helper
 ├── tests/                         # Node built-in test suites
-├── design/                        # Illustration source assets
-├── docs/                           # Architecture and product documentation
+├── docs/                          # Architecture, product documentation and JelHR SVG brand mark
+│   ├── architecture.md
+│   └── jelhr-logo.svg
 ├── wrangler.toml                  # Cloudflare resource and binding configuration
 ├── package.json                   # Scripts and runtime requirements
 ├── DEPLOYMENT.md                  # Detailed production operations
@@ -843,17 +861,11 @@ Track remaining implementation work in [UNFINISHED.md](UNFINISHED.md).
 | [UNFINISHED.md](UNFINISHED.md) | Remaining v0.4 frontend and production readiness work. |
 | [CHANGELOG.md](CHANGELOG.md) | Release history. |
 
-## Screenshots
+## Visual assets
 
-| Dashboard | Offboarding case | E-sign certificate |
-|---|---|---|
-| ![Dashboard](docs/screenshots/dashboard.webp) | ![Offboarding](docs/screenshots/offboarding-case.webp) | ![Certificate](docs/screenshots/e-sign-certificate.webp) |
+The README uses the repository-owned vector logo at [docs/jelhr-logo.svg](docs/jelhr-logo.svg). The technology badges above are rendered as hosted SVG badges and do not depend on local image folders. The architecture diagrams throughout this document are Mermaid source, so they remain readable and editable in GitHub.
 
-| Communications | Platform console |
-|---|---|
-| ![Communications](docs/screenshots/communications.webp) | ![Platform](docs/screenshots/platform.webp) |
-
-Screenshots use synthetic demo data.
+No application screenshot files are currently committed. Screenshot placeholders have intentionally been removed until real, current UI captures are added to the repository.
 
 ## License
 
