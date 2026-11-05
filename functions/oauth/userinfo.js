@@ -1,5 +1,5 @@
 import { respond } from "../_shared/http.js";
-import { verifyRs256, issuerFor } from "../_shared/oidc.js";
+import { verifyRs256, issuerFor } from "../_shared/oidc-provider.js";
 export async function onRequestGet({ request, env }) {
   const match = /^Bearer\s+(.+)$/i.exec(request.headers.get("Authorization") || "");
   if (!match) return respond({ error: "invalid_token" }, 401, { "WWW-Authenticate": 'Bearer error="invalid_token"' });
