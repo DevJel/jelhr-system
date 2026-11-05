@@ -44,6 +44,35 @@ The callback URL must match exactly. Do not use wildcard hosts, paths or regex m
 
 Generate an RSA 2048-bit key pair locally with WebCrypto. Export the private JWK directly into the Cloudflare Pages secret prompt. The provider derives and publishes the public part at JWKS. Use a dedicated OIDC key, not the Actalis TLS certificate. Protect an offline recovery copy and plan key rotation by publishing old and new public keys concurrently before retiring the old key.
 
+## Cloudflare Zero Trust as the eSign relying party
+
+For the eSign front door, Cloudflare Access is the OIDC relying party (client) and eSign continues to validate the Access JWT on every employee request. The existing eSign Worker already supports this mode through its Access JWT verification and session exchange. This avoids duplicating OIDC token validation inside the eSign application.
+
+Register a confidential client in JelHR for the Cloudflare Access team:
+
+~~~json
+{
+  "cloudflare-access": {
+    "redirectUris": ["https://YOUR-TEAM.cloudflareaccess.com/cdn-cgi/access/callback"],
+    "scopes": ["openid", "profile", "email"],
+    "clientSecretHash": "BASE64URL_SHA256_OF_THE_CLIENT_SECRET"
+  }
+}
+~~~
+
+Generate a unique high-entropy client secret. Give the raw secret only to the Cloudflare Zero Trust Generic OIDC provider configuration. Store only its SHA-256 base64url digest in the protected JelHR client registry. The token endpoint supports client_secret_basic and client_secret_post for confidential clients, and no client authentication for PKCE public clients.
+
+In Cloudflare Zero Trust:
+1. Add an OpenID Connect identity provider using JelHR's discovery document.
+2. Set the client ID to cloudflare-access and use the raw generated client secret.
+3. Use the authorization, token, userinfo and JWKS URLs from discovery.
+4. Enable PKCE when configuring the OIDC connector.
+5. Test the provider before assigning it to the eSign Access application.
+
+Protect the eSign employee hostname with a Self-hosted Access application. Allow only the Operava employee email domain, set an eight-hour application session, and require independent MFA according to the selected Access policy. The eSign Worker must use STAFF_AUTH_MODE=access so its existing per-request Access JWT verification and application-session exchange remain active. Do not switch the Business manifest from local to Access mode until the Access application, identity provider and administrator sign-in have been verified.
+
+The Cloudflare Access free plan is advertised for teams under 50 users. Custom certificate upload is a separate feature and is not available on Cloudflare Free; it is listed for Business and Enterprise plans. Therefore, the custom Actalis edge-certificate requirement is not compatible with a strict $0 Free-plan-only requirement. Use Cloudflare-managed edge TLS on Free, or confirm that the Operava zone already has an eligible Business/Enterprise plan before attempting a custom upload.
+
 ## Database
 
 Apply migrations/0005_operava_oidc_provider.sql to the production D1 database before enabling the provider. It creates only a short-lived authorization-code table and does not modify HR records.
