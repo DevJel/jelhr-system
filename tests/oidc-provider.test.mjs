@@ -117,3 +117,50 @@ test("OIDC rejects unregistered redirect URIs and unauthenticated authorize redi
   assert.equal(location.pathname, "/login.html");
   assert.ok(location.searchParams.get("returnTo").startsWith("/oauth/authorize?"));
 });
+
+test("confidential Cloudflare Access OIDC client authenticates with client_secret_basic", async () => {
+  const secret = "operava-cloudflare-access-client-secret-for-tests";
+  const secretHash = b64url(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(secret)));
+  const pair = await crypto.subtle.generateKey(
+    { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
+    true, ["sign", "verify"]
+  );
+  const privateJwk = await crypto.subtle.exportKey("jwk", pair.privateKey);
+  const env = makeEnv({
+    JELHR_OIDC_ISSUER: ORIGIN,
+    JELHR_OIDC_PRIVATE_JWK: JSON.stringify(privateJwk),
+    JELHR_OIDC_KID: "test-operava-access-key",
+    OPERAVA_OIDC_CLIENTS_JSON: JSON.stringify({
+      "cloudflare-access": {
+        redirectUris: ["https://test-team.cloudflareaccess.com/cdn-cgi/access/callback"],
+        scopes: ["openid", "profile", "email"],
+        clientSecretHash: secretHash
+      }
+    })
+  });
+  const { owner } = await setupOrg(env);
+  const { verifier, challenge } = await pkce();
+  const state = b64url(crypto.getRandomValues(new Uint8Array(24)));
+  const nonce = b64url(crypto.getRandomValues(new Uint8Array(24)));
+  const redirectUri = "https://test-team.cloudflareaccess.com/cdn-cgi/access/callback";
+  const params = new URLSearchParams({
+    response_type: "code", client_id: "cloudflare-access", redirect_uri: redirectUri,
+    scope: "openid profile email", state, nonce, code_challenge: challenge,
+    code_challenge_method: "S256"
+  });
+  const started = await owner.get("/oauth/authorize?" + params.toString());
+  assert.equal(started.status, 302);
+  const code = new URL(started.headers.get("Location")).searchParams.get("code");
+  assert.ok(code);
+  const body = { grant_type: "authorization_code", redirect_uri: redirectUri, code, code_verifier: verifier };
+  const wrong = await owner.raw("POST", "/oauth/token", body, {
+    Authorization: "Basic " + Buffer.from("cloudflare-access:wrong-secret").toString("base64")
+  });
+  assert.equal(wrong.status, 401);
+  assert.equal(wrong.data.error, "invalid_client");
+  const ok = await owner.raw("POST", "/oauth/token", body, {
+    Authorization: "Basic " + Buffer.from("cloudflare-access:" + secret).toString("base64")
+  });
+  assert.equal(ok.status, 200);
+  assert.ok(ok.data.id_token);
+});
