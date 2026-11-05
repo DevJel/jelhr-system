@@ -3,7 +3,7 @@
   var path=location.pathname.split('/').pop()||'index.html';
   if(path==='login.html')return;
   try{
-    var response=await fetch('/api/auth/me',{credentials:'same-origin',cache:'no-store'});
+    var response=await fetch('/api/bff/auth/navigation',{credentials:'same-origin',cache:'no-store'});
     if(!response.ok)throw new Error('not signed in');
     var data=await response.json(),role=data.user.role;
     if(role==='employee'&&path!=='employee.html'){location.replace('employee.html');return}
