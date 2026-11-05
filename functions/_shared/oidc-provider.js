@@ -19,7 +19,13 @@ export function getClients(env) {
 export function getClient(env, clientId) {
   const client = getClients(env)[clientId];
   if (!client || !Array.isArray(client.redirectUris) || !client.redirectUris.length) return null;
-  return client;
+  if (!client.redirectUris.every(uri => {
+    try { const parsed = new URL(uri); return parsed.protocol === "https:"; }
+    catch { return false; }
+  })) return null;
+  const scopes = Array.isArray(client.scopes) ? client.scopes : ["openid", "profile", "email"];
+  if (!scopes.includes("openid")) return null;
+  return { ...client, scopes };
 }
 function parsePrivateJwk(env) {
   try {
