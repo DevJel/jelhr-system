@@ -72,3 +72,6 @@ export async function verifyIdToken(env, conf, idToken, { clientId, nonce }) {
   if (claims.email_verified === false) throw new Error("Your email isn't verified at the identity provider");
   return { email, name: claims.name || null, subject: claims.sub };
 }
+
+// Backward-compatible issuer helper export for existing OIDC client tests/routes.
+export { issuerFor } from "./oidc-provider.js";
