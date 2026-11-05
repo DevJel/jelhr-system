@@ -6,7 +6,7 @@ const PRIVATE_KEYS = new Set([
   "userid", "user_id", "owner_user_id", "employee_user_id",
   "accesstoken", "access_token", "idtoken", "id_token",
   "refreshtoken", "refresh_token", "clientsecret", "client_secret",
-  "code_verifier", "privatekey", "private_key", "signature"
+  "code_verifier", "privatekey", "private_key"
 ]);
 
 function project(value) {
