@@ -25,7 +25,7 @@ The production deployment is hosted on **Cloudflare Pages in the Jelvan - Busine
 </p>
 
 > [!IMPORTANT]
-> **Release boundary — v0.4 backend deployed; v0.3 frontend still active.** The v0.4 backend APIs and database migrations (0001–0004) are deployed and the production health endpoint reports all configured infrastructure bindings ready. The current browser interface is still the v0.3 UI. The new recruitment/careers, MFA/passkey, SSO, invitation acceptance and AI knowledge screens are not complete. Platform administration is not yet initialized (`platformAdmin: false` on the latest health check), and outbound SES delivery still needs a controlled end-to-end test. Keep the application on synthetic data until the [production go-live checklist](DEPLOYMENT.md#release-status-and-go-live-checklist) is complete.
+> **Release boundary — v0.4 backend deployed; v0.3 frontend still active.** The v0.4 backend APIs and database migrations (0001–0004) are deployed and the production health endpoint reports all configured infrastructure bindings ready. The current browser interface is still the v0.3 UI. The new recruitment/careers, MFA/passkey, SSO, invitation acceptance and AI knowledge screens are not complete. A first-party Operava OIDC identity-provider foundation is under review in PR #4 and is not active in production. Platform administration is not yet initialized (`platformAdmin: false` on the latest health check), and outbound SES delivery still needs a controlled end-to-end test. Keep the application on synthetic data until the [production go-live checklist](DEPLOYMENT.md#release-status-and-go-live-checklist) is complete.
 
 ---
 
