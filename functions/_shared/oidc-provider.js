@@ -39,6 +39,7 @@ export function publicJwk(env) {
   if (!privateJwk) return null;
   const pub = Object.fromEntries(Object.entries(privateJwk).filter(([k]) => !PRIVATE_FIELDS.has(k)));
   pub.use = "sig"; pub.alg = "RS256"; pub.kid = String(env.JELHR_OIDC_KID || "operava-oidc-2026-01");
+  pub.key_ops = ["verify"]; pub.ext = true;
   return pub;
 }
 async function signingKey(env) {
