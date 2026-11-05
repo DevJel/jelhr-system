@@ -20,6 +20,7 @@ export function makeEnv(extra = {}) {
     JELHR_SUPERADMIN_PASSWORD: SUPER.password,
     EMAIL_PROVIDER: "log",
     EMAIL_FROM: "hr@jelhr.test",
+    TURNSTILE_VERIFIER: { fetch: async () => Response.json({ success: true }) }, // deterministic local test verifier only
     __exposeOtp: true, // test harness only: return dev OTPs so integration tests can complete MFA
     ...extra
   };
