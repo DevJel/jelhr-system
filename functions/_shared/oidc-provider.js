@@ -96,7 +96,7 @@ export async function createAuthorizationCode(env, user, clientId, redirectUri, 
 export async function exchangeAuthorizationCode(env, body, issuer, request) {
   const auth = request.headers.get("Authorization") || "";
   let basicClientId = "", basicSecret = "";
-  if (auth.startsWith("Basic ")) {
+  if (/^Basic\s+/i.test(auth)) {
     try {
       const decoded = atob(auth.slice(6));
       const split = decoded.indexOf(":");
