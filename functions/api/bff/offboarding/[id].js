@@ -1,0 +1,1 @@
+export { onRequestGet, onRequestPatch } from "../../offboarding/[id].js";
