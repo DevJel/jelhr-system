@@ -10,7 +10,7 @@
     if(role==='auditor'&&path!=='demo.html'){location.replace('demo.html');return}
     if(['owner','admin','hr_manager'].includes(role)===false && ['offboarding.html','employees.html','security.html','settings.html'].includes(path)){location.replace('employee.html');return}
     var profile=document.querySelector('.user-meta .name'),roleNode=document.querySelector('.user-meta .role');
-    if(profile)profile.textContent=data.user.name;
+    if(profile)profile.textContent=data.user.displayName;
     if(roleNode)roleNode.textContent=role.replace('_',' ');
   }catch(e){location.replace('login.html');return}
   document.querySelectorAll('.nav a,.mobile-nav a').forEach(function(a){var file=(a.getAttribute('href')||'').split('/').pop();if(file===path)a.classList.add('active')});
