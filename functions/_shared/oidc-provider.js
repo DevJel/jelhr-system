@@ -1,4 +1,4 @@
-import { b64url, fromB64url, randomToken, sha256b64 } from "./crypto.js";
+import { b64url, fromB64url, randomToken, sha256b64, safeEqual } from "./crypto.js";
 import { requireUser } from "./auth.js";
 import { respond, HttpError } from "./http.js";
 
@@ -25,6 +25,7 @@ export function getClient(env, clientId) {
   })) return null;
   const scopes = Array.isArray(client.scopes) ? client.scopes : ["openid", "profile", "email"];
   if (!scopes.includes("openid")) return null;
+  if (client.clientSecretHash != null && (typeof client.clientSecretHash !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(client.clientSecretHash))) return null;
   return { ...client, scopes };
 }
 function parsePrivateJwk(env) {
@@ -92,9 +93,30 @@ export async function createAuthorizationCode(env, user, clientId, redirectUri, 
     .bind(await sha256b64(code), clientId, user.id, user.organization_id, redirectUri, challenge, nonce, scope, new Date(Date.now() + 300000).toISOString()).run();
   return code;
 }
-export async function exchangeAuthorizationCode(env, body, issuer) {
-  const clientId = String(body.client_id || ""), client = getClient(env, clientId);
+export async function exchangeAuthorizationCode(env, body, issuer, request) {
+  const auth = request.headers.get("Authorization") || "";
+  let basicClientId = "", basicSecret = "";
+  if (auth.startsWith("Basic ")) {
+    try {
+      const decoded = atob(auth.slice(6));
+      const split = decoded.indexOf(":");
+      if (split < 1) throw new Error("bad basic auth");
+      basicClientId = decoded.slice(0, split);
+      basicSecret = decoded.slice(split + 1);
+    } catch { throw new HttpError(401, "invalid_client"); }
+  } else if (auth) {
+    throw new HttpError(401, "invalid_client");
+  }
+  const clientId = String(basicClientId || body.client_id || "");
+  if (basicClientId && body.client_id && body.client_id !== basicClientId) throw new HttpError(401, "invalid_client");
+  const client = getClient(env, clientId);
   if (!client) throw new HttpError(401, "invalid_client");
+  const suppliedSecret = basicSecret || String(body.client_secret || "");
+  if (client.clientSecretHash) {
+    if (!suppliedSecret || !safeEqual(await sha256b64(suppliedSecret), client.clientSecretHash)) throw new HttpError(401, "invalid_client");
+  } else if (suppliedSecret) {
+    throw new HttpError(401, "invalid_client");
+  }
   if (body.grant_type !== "authorization_code") throw new HttpError(400, "unsupported_grant_type");
   const code = String(body.code || ""), redirectUri = String(body.redirect_uri || ""), verifier = String(body.code_verifier || "");
   if (!code || !redirectUri || !/^[A-Za-z0-9._~-]{43,128}$/.test(verifier) || !client.redirectUris.includes(redirectUri)) throw new HttpError(400, "invalid_grant");
