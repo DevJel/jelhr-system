@@ -1,5 +1,5 @@
 import { respond, HttpError } from "../_shared/http.js";
-import { parseTokenRequest, exchangeAuthorizationCode, issuerFor, oidcError } from "../_shared/oidc.js";
+import { parseTokenRequest, exchangeAuthorizationCode, issuerFor, oidcError } from "../_shared/oidc-provider.js";
 export async function onRequestPost({ request, env }) {
   let body;
   try { body = await parseTokenRequest(request); }
