@@ -73,7 +73,11 @@ export async function verifyRs256(token, env) {
 export async function parseTokenRequest(request) {
   const raw = await request.text();
   const type = (request.headers.get("Content-Type") || "").split(";")[0].trim().toLowerCase();
-  if (type === "application/x-www-form-urlencoded") return Object.fromEntries(new URLSearchParams(raw));
+  if (type === "application/x-www-form-urlencoded") {
+    const params = new URLSearchParams(raw);
+    for (const key of params.keys()) if (params.getAll(key).length !== 1) throw new HttpError(400, "invalid_request");
+    return Object.fromEntries(params);
+  }
   if (type === "application/json") {
     try { const parsed = JSON.parse(raw || "{}"); if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error(); return parsed; }
     catch { throw new HttpError(400, "invalid_request"); }
