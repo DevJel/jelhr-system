@@ -24,7 +24,7 @@ Set these as Cloudflare Pages production secrets/variables for JelHR. Never put 
 
 | Name | Type | Value |
 |---|---|---|
-| JELHR_OIDC_ISSUER | Variable | Exact canonical HTTPS JelHR identity-provider origin, no trailing slash. |
+| JELHR_OIDC_ISSUER | Variable | https://jelhr-system-213.pages.dev (current production Pages origin; no trailing slash). |
 | OPERAVA_OIDC_CLIENTS_JSON | Secret | JSON client registry; store only SHA-256 base64url hashes for confidential client secrets. |
 | JELHR_OIDC_PRIVATE_JWK | Secret | Dedicated RSA private JWK for OIDC signing. |
 | JELHR_OIDC_KID | Variable | Stable key identifier, e.g. operava-oidc-2026-01. |
@@ -53,7 +53,7 @@ Register a confidential client in JelHR for the Cloudflare Access team:
 ~~~json
 {
   "cloudflare-access": {
-    "redirectUris": ["https://YOUR-TEAM.cloudflareaccess.com/cdn-cgi/access/callback"],
+    "redirectUris": ["https://dry-rain-3eba.cloudflareaccess.com/cdn-cgi/access/callback"],
     "scopes": ["openid", "profile", "email"],
     "clientSecretHash": "BASE64URL_SHA256_OF_THE_CLIENT_SECRET"
   }
