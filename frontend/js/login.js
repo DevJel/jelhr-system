@@ -43,7 +43,7 @@ function loadTurnstile(siteKey){
  document.head.appendChild(script);
 }
 (async()=>{
- const fallbackSiteKey='0x4AAAAAAFkWaPgHqafVv66D';
+ const fallbackSiteKey='0x4AAAAAAF0JVFRrhPXqt914';
  let siteKey=fallbackSiteKey;
  try{
   const r=await fetch('/api/auth/config',{credentials:'same-origin',cache:'no-store'});
