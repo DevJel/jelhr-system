@@ -20,6 +20,8 @@ export function makeEnv(extra = {}) {
     JELHR_SUPERADMIN_PASSWORD: SUPER.password,
     EMAIL_PROVIDER: "log",
     EMAIL_FROM: "hr@jelhr.test",
+    TURNSTILE_VERIFIER: { fetch: async () => Response.json({ success: true }) }, // deterministic local test verifier only
+    __exposeOtp: true, // test harness only: return dev OTPs so integration tests can complete MFA
     ...extra
   };
 }
@@ -63,7 +65,13 @@ export async function setupOrg(env, name = "Acme People", ownerEmail = "owner@ac
   const org = await platform.post("/api/platform/organizations", { name, adminEmail: ownerEmail, adminName: "Olivia Owner", adminPassword: "Temporary-Pass-1234", adminRole: "owner" });
   if (org.status !== 201) throw new Error("org create failed " + JSON.stringify(org.data));
   const owner = client(env);
-  await owner.post("/api/auth/login", { email: ownerEmail, password: "Temporary-Pass-1234" });
+  const firstFactor = await owner.post("/api/auth/login", { email: ownerEmail, password: "Temporary-Pass-1234" });
+  if (firstFactor.status !== 200) throw new Error("owner login failed " + JSON.stringify(firstFactor.data));
+  if (firstFactor.data?.mfaRequired) {
+    const sent = await owner.post("/api/auth/mfa", { action: "email", challengeId: firstFactor.data.challengeId });
+    const verified = await owner.post("/api/auth/mfa", { action: "verify", challengeId: firstFactor.data.challengeId, method: "email_otp", code: sent.data?.devCode });
+    if (verified.status !== 200) throw new Error("owner MFA failed " + JSON.stringify(verified.data));
+  }
   const pw = await owner.post("/api/auth/password", { currentPassword: "Temporary-Pass-1234", newPassword: PASSWORD });
   if (pw.status !== 200) throw new Error("password change failed " + JSON.stringify(pw.data));
   return { platform, owner, orgId: org.data.id };
@@ -81,7 +89,13 @@ export async function employeeLogin(env, owner, employeeId, email, role = "emplo
   const u = await owner.post("/api/users", { email, displayName: emp ? `${emp.first_name} ${emp.last_name}` : email.split("@")[0], role, employeeId, password: "Temporary-Pass-1234" });
   if (u.status !== 201) throw new Error("user create failed " + JSON.stringify(u.data));
   const c = client(env);
-  await c.post("/api/auth/login", { email, password: "Temporary-Pass-1234" });
+  const firstFactor = await c.post("/api/auth/login", { email, password: "Temporary-Pass-1234" });
+  if (firstFactor.status !== 200) throw new Error("employee login failed " + JSON.stringify(firstFactor.data));
+  if (firstFactor.data?.mfaRequired) {
+    const sent = await c.post("/api/auth/mfa", { action: "email", challengeId: firstFactor.data.challengeId });
+    const verified = await c.post("/api/auth/mfa", { action: "verify", challengeId: firstFactor.data.challengeId, method: "email_otp", code: sent.data?.devCode });
+    if (verified.status !== 200) throw new Error("employee MFA failed " + JSON.stringify(verified.data));
+  }
   await c.post("/api/auth/password", { currentPassword: "Temporary-Pass-1234", newPassword: PASSWORD });
   return { client: c, userId: u.data.id };
 }

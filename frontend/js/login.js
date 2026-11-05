@@ -4,6 +4,7 @@ const form=document.querySelector('#loginForm'),button=document.querySelector('#
 const credentialsStep=document.querySelector('#credentialsStep'),otpStep=document.querySelector('#otpStep');
 const verifyOtpBtn=document.querySelector('#verifyOtpBtn'),backBtn=document.querySelector('#backBtn');
 const stepTitle=document.querySelector('#stepTitle'),stepIntro=document.querySelector('#stepIntro');
+const requestedReturnTo=(()=>{const raw=new URLSearchParams(location.search).get('returnTo');if(!raw||!raw.startsWith('/')||raw.startsWith('//'))return null;try{const u=new URL(raw,location.origin);return u.origin===location.origin?u.pathname+u.search+u.hash:null}catch{return null}})();
 let turnstileWidget=null,turnstileToken='',challengeId='',turnstileReady=false,turnstileLoading=false;
 function showError(message){error.textContent=message||''}
 function setBusy(control,busy,label){control.disabled=busy;control.textContent=busy?'Please wait…':label}
@@ -46,7 +47,7 @@ function loadTurnstile(siteKey){
  const fallbackSiteKey='0x4AAAAAAF0JVFRrhPXqt914';
  let siteKey=fallbackSiteKey;
  try{
-  const r=await fetch('/api/auth/config',{credentials:'same-origin',cache:'no-store'});
+  const r=await fetch('/api/bff/auth/config',{credentials:'same-origin',cache:'no-store'});
   const d=await r.json().catch(()=>({}));
   if(r.ok&&d.turnstileSiteKey)siteKey=d.turnstileSiteKey;
   else console.warn('Using the configured public Turnstile site key fallback.');
@@ -61,7 +62,7 @@ form.addEventListener('submit',async event=>{
  const token=turnstileToken;
  setBusy(button,true,'Continue');
  try{
-  const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({identifier:form.elements.identifier.value,password:form.elements.password.value,turnstileToken:token})});
+  const r=await fetch('/api/bff/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({identifier:form.elements.identifier.value,password:form.elements.password.value,turnstileToken:token})});
   const d=await r.json().catch(()=>({}));
   if(!r.ok)throw new Error(d.error||'Unable to sign in');
   if(!d.emailOtpRequired||!d.challengeId)throw new Error('The email verification step could not be started. Please try again.');
@@ -82,10 +83,10 @@ verifyOtpBtn.addEventListener('click',async()=>{
  if(!/^\d{6}$/.test(code)){showError('Enter the six-digit code from your email.');return}
  setBusy(verifyOtpBtn,true,'Verify and sign in');
  try{
-  const r=await fetch('/api/auth/mfa',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'verify',challengeId,method:'email_otp',code})});
+  const r=await fetch('/api/bff/auth/mfa',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'verify',challengeId,method:'email_otp',code})});
   const d=await r.json().catch(()=>({}));
   if(!r.ok)throw new Error(d.error||'The verification code could not be accepted');
-  location.replace(d.user.role==='employee'?'employee.html':'index.html');
+  location.replace(requestedReturnTo||(d.user.role==='employee'?'employee.html':'index.html'));
  }catch(e){showError(e.message||'Unable to verify the code.');setBusy(verifyOtpBtn,false,'Verify and sign in')}
 });
 backBtn.addEventListener('click',()=>{

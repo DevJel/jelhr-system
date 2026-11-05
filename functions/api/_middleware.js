@@ -1,6 +1,6 @@
 // API middleware: error handling, CSRF/Origin enforcement, body limits, read-only demo role.
 import { respond, HttpError, BASE_HEADERS } from "../_shared/http.js";
-import { ResponseError, readSessionToken } from "../_shared/auth.js";
+import { ResponseError, readSessionToken, requireUser } from "../_shared/auth.js";
 import { verifyJwt } from "../_shared/crypto.js";
 import { readPlatformToken } from "../_shared/platform.js";
 
@@ -38,6 +38,12 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const requestId = crypto.randomUUID();
   try {
+    // Legacy internal/admin/database namespaces require a valid HttpOnly app session.
+    // Individual handlers continue to enforce role checks and tenant ownership.
+    if (/^\/api\/(?:internal|admin|db)(?:\/|$)/.test(url.pathname)) {
+      const auth = await requireUser(request, env);
+      if (auth.error) return hardenResponse(auth.error, requestId);
+    }
     if (!SAFE.has(request.method)) {
       if (!sameOrigin(request)) return respond({ error: "Cross-site request blocked" }, 403);
       const length = Number(request.headers.get("Content-Length") || 0);
@@ -47,7 +53,7 @@ export async function onRequest(context) {
         return respond({ error: "Content-Type must be application/json" }, 415);
       }
       // Demo/auditor accounts are strictly read-only (logout and own password excepted).
-      if (!COOKIELESS.has(url.pathname) && !isPublic(url.pathname) && !url.pathname.startsWith("/api/platform/") && !["/api/auth/logout", "/api/auth/password"].includes(url.pathname)) {
+      if (!COOKIELESS.has(url.pathname) && !isPublic(url.pathname) && !url.pathname.startsWith("/api/platform/") && !["/api/auth/logout", "/api/auth/password", "/api/bff/auth/logout"].includes(url.pathname)) {
         const token = readSessionToken(request);
         const payload = token && env.JELHR_JWT_SECRET ? await verifyJwt(token, env.JELHR_JWT_SECRET) : null;
         if (payload?.role === "auditor") return respond({ error: "Demo accounts are read-only" }, 403);
