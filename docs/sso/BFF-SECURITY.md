@@ -14,7 +14,8 @@ The network panel will still show the public /api/bff/* URL, request method, sta
 ## JelHR (IdP)
 
 - Browser login uses /api/bff/auth/config, /api/bff/auth/login and /api/bff/auth/mfa.
-- /api/bff/auth/me requires a valid jelhr_session cookie and returns only email, displayName and avatar.
+- /api/bff/auth/me requires a valid jelhr_session cookie and returns exactly email, displayName and avatar.
+- /api/bff/auth/navigation returns only the display name and role needed for navigation; it omits all database identifiers.
 - MFA completion preserves the HttpOnly session cookie but returns only a minimal UI role marker, not the full user or organization object.
 - Existing server-side session validation, OTP, Turnstile, CSRF and role checks remain in place.
 - Direct /api/internal/*, /api/admin/* and /api/db/* requests require a valid session cookie; the endpoint's own role/ownership checks still apply.
@@ -27,7 +28,7 @@ JelHR's OIDC token and JWKS endpoints are protocol endpoints for trusted relying
 - src/index.ts maps BFF paths to internal handlers after enforcing the BFF boundary.
 - Legacy browser requests to internal /api/* handlers are rejected (404), with explicit health, CSP report and service probe exceptions.
 - Every protected BFF route still uses the existing Cloudflare Access host/audience validation, app session, CSRF and role checks.
-- /api/bff/auth/me returns a minimal identity projection: email, display name, avatar placeholder and UI role, plus the in-memory CSRF token. It does not return a user ID, tenant ID, Access JWT or token claims.
+- /api/bff/auth/me returns exactly email, display name and avatar placeholder. /api/bff/auth/context is a separate UI session endpoint for role/host and the in-memory CSRF nonce; it contains no internal user ID, tenant ID, Access JWT or token claims.
 - /api/bff/esign/documents runs a server-side owner-scoped query and returns only document ID, title, status and creation time.
 - /api/bff/sso/exchange uses the verified Cloudflare Access identity on the server to create the host-bound eSign HttpOnly session. The browser receives only the session cookie and CSRF value.
 
