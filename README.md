@@ -1,11 +1,11 @@
-# Bolek HRIS
+# JelHR System
 
-**Bolek HRIS** is a multi-tenant Human Resources Information System (HRIS) designed to support the employee lifecycle: recruitment, applicant screening, hiring, onboarding, employee administration, time tracking, documents, communications, electronic signatures and offboarding.
+**JelHR** is a multi-tenant Human Resources Information System (HRIS) designed to support the employee lifecycle: recruitment, applicant screening, hiring, onboarding, employee administration, time tracking, documents, communications, electronic signatures and offboarding.
 
 The production deployment is hosted on **Cloudflare Pages in the Jelvan - Business - Operava account**. Its server-side API runs on Pages Functions, with Cloudflare D1 as the relational system of record, R2 for private file objects, Workers AI for assisted HR workflows, Vectorize for optional semantic retrieval, and an internal Worker service binding for AWS SES email delivery.
 
 <p align="center">
-  <img src="functions/api/public/jelhr_circled_logo.png" alt="Bolek HRIS logo" width="240" />
+  <img src="functions/api/public/jelhr_circled_logo.png" alt="JelHR circled logo" width="240" />
 </p>
 
 <p align="center">
@@ -708,7 +708,7 @@ jelhr-system/
 │   ├── ui-check.mjs               # UI checks and screenshots
 │   └── generate-images.py         # Image generation helper
 ├── tests/                         # Node built-in test suites
-├── docs/                          # Architecture, product documentation and Bolek HRIS SVG brand mark
+├── docs/                          # Architecture, product documentation and JelHR SVG brand mark
 │   ├── architecture.md
 │   └── jelhr-logo.svg
 ├── wrangler.toml                  # Cloudflare resource and binding configuration
