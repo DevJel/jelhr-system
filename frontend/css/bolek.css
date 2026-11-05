@@ -17,3 +17,65 @@ body.auth-page{display:flow-root;min-height:100dvh}body.auth-page *,body.dashboa
   .visual-label{top:12px;left:12px;padding:9px 12px}
   .visual-card{bottom:10px;left:12px;right:12px;min-width:0;padding:11px 14px}
 }
+
+
+/* Bolek HRIS visual identity — calm, people-first workforce operations. */
+:root{
+  --bg:#F4F6F3;--card:#FFFFFF;--card-white:#FFFFFF;--ink:#1D2B28;
+  --muted:#687772;--muted-2:#899891;--accent:#B8D8C4;
+  --border:rgba(29,43,40,.11);--radius:18px;--radius-sm:12px;
+  --bolek-forest:#173D35;--bolek-forest-2:#214E43;--bolek-mint:#B8D8C4;
+  --bolek-lime:#D7E8A5;--bolek-cream:#F7F7F0;--bolek-coral:#E5A58A;
+}
+html,body{background:var(--bg);color:var(--ink)}
+.sidebar{background:linear-gradient(180deg,#173D35 0%,#102F29 100%);color:#F8FBF8}
+.brand-mark{background:var(--bolek-mint);color:#173D35;border-radius:12px}
+.brand-sub{color:rgba(248,251,248,.62)}
+.nav a{color:rgba(248,251,248,.72)}
+.nav a:hover{background:rgba(255,255,255,.09);color:#fff}
+.nav a.active{background:var(--bolek-mint);color:#173D35}
+.user-avatar{background:#28594C;color:var(--bolek-lime)}
+.user-meta .role{color:rgba(248,251,248,.58)}
+.mobile-nav{background:rgba(23,61,53,.97)}
+.mobile-nav a{color:rgba(255,255,255,.72)}
+.mobile-nav a.active{color:var(--bolek-lime)}
+.card{border:1px solid rgba(29,43,40,.07);box-shadow:0 8px 28px rgba(23,61,53,.055)}
+.card-cream{background:var(--bolek-cream)}
+.card-dark,.dark-box{background:#173D35;color:#F8FBF8}
+.btn-dark{background:#173D35;color:#fff}
+.btn-dark:hover{background:#214E43}
+.btn-accent,.nav a.active{background:var(--bolek-mint);color:#173D35}
+.btn-accent:hover{background:#C9E3D2}
+.badge-yellow{background:#EEF4D9;color:#3D5729}
+.progress{background:rgba(23,61,53,.1)}
+.page-header h1,.welcome h1{color:#173D35}
+.page-header p,.welcome p:not(.eyebrow){color:#687772}
+.auth-page{background:linear-gradient(145deg,#F4F6F3 0%,#E7F0E9 58%,#F7F7F0 100%)}
+.auth-frame{background:transparent}
+.wordmark{border-color:rgba(23,61,53,.18);color:#173D35;background:rgba(255,255,255,.72)}
+.wordmark span{color:#547067}
+.auth-center input{border:1px solid rgba(23,61,53,.12);background:#fff;color:#1D2B28}
+.auth-center button{background:#173D35;color:#fff}
+.auth-center button:hover{background:#214E43}
+.auth-visual{background-color:#B8D8C4}
+.visual-label{background:#D7E8A5;color:#173D35}
+.visual-card{color:#1D2B28}
+.eyebrow{color:#547067}
+.sample-pill{border-color:#C8D8C9;background:#EEF4E9;color:#36564A}
+.dash-card{background:rgba(255,255,255,.88);border:1px solid rgba(23,61,53,.07);box-shadow:0 10px 32px rgba(23,61,53,.05)}
+.intro-card{background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(232,242,233,.92)),var(--team-image) center/cover}
+.strip span,.yellow-strip span{background:#173D35;color:#fff}
+.strip span:nth-child(2),.yellow-strip span:first-child{background:#B8D8C4;color:#173D35}
+.strip span:nth-child(3),.yellow-strip span:last-child{background:#EEF4E9;color:#36564A}
+.timer-dial{background:conic-gradient(#B8D8C4 0 65%,#E4EAE4 65%)}
+.timer-dial>div{background:#F7FAF6}
+.round-mark{background:#EAF2EC;color:#173D35}
+.dark-box a{border-color:rgba(255,255,255,.16)}
+.dark-box small{color:#C3D4CC}
+.dark-box b{color:#D7E8A5}
+.dashboard-switch{background:#E7EEE8}
+.dashboard-switch button.selected{background:#173D35;color:#fff}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid rgba(61,112,91,.42);outline-offset:3px}
+.bolek-hris-footer{width:100%;padding:18px 20px 22px;text-align:center;color:#71817A;font-size:11px;line-height:1.5;letter-spacing:.015em}
+.auth-content .bolek-hris-footer{padding:18px 0 0;text-align:left}
+@media(max-width:760px){.bolek-hris-footer{padding:14px 16px calc(16px + env(safe-area-inset-bottom));font-size:10px}}
