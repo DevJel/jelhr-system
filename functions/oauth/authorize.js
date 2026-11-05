@@ -1,5 +1,5 @@
 import { respond } from "../_shared/http.js";
-import { getClient, issuerFor, createAuthorizationCode, requireSignedInUser } from "../_shared/oidc.js";
+import { getClient, issuerFor, createAuthorizationCode, requireSignedInUser } from "../_shared/oidc-provider.js";
 const fail = (message, status = 400) => respond({ error: message }, status);
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url), clientId = url.searchParams.get("client_id") || "";
