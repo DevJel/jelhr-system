@@ -9,7 +9,7 @@ export async function onRequestGet({ request, env }) {
   if (!client.redirectUris.includes(redirectUri)) return fail("invalid_redirect_uri");
   if (url.searchParams.get("response_type") !== "code") return fail("unsupported_response_type");
   const scope = String(url.searchParams.get("scope") || "").trim().split(/\s+/).filter(Boolean);
-  if (!scope.includes("openid") || scope.some(s => !["openid", "profile", "email"].includes(s))) return fail("invalid_scope");
+  if (!scope.includes("openid") || scope.some(s => !client.scopes.includes(s))) return fail("invalid_scope");
   const state = String(url.searchParams.get("state") || ""), nonce = String(url.searchParams.get("nonce") || "");
   const challenge = String(url.searchParams.get("code_challenge") || "");
   if (state.length < 16 || state.length > 512 || nonce.length < 16 || nonce.length > 512) return fail("invalid_request: state and nonce are required");
