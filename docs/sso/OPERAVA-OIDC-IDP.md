@@ -25,7 +25,7 @@ Set these as Cloudflare Pages production secrets/variables for JelHR. Never put 
 | Name | Type | Value |
 |---|---|---|
 | JELHR_OIDC_ISSUER | Variable | Exact canonical HTTPS JelHR identity-provider origin, no trailing slash. |
-| OPERAVA_OIDC_CLIENTS_JSON | Variable | JSON client registry shown below. |
+| OPERAVA_OIDC_CLIENTS_JSON | Secret | JSON client registry; store only SHA-256 base64url hashes for confidential client secrets. |
 | JELHR_OIDC_PRIVATE_JWK | Secret | Dedicated RSA private JWK for OIDC signing. |
 | JELHR_OIDC_KID | Variable | Stable key identifier, e.g. operava-oidc-2026-01. |
 
