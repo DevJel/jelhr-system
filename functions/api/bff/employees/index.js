@@ -1,0 +1,1 @@
+export { onRequestGet, onRequestPost } from "../../employees/index.js";
