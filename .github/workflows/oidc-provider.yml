@@ -4,13 +4,16 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - "frontend/**"
       - "functions/**"
       - "migrations/**"
       - "tests/**"
       - "package.json"
+      - "scripts/ui-check.mjs"
+      - "V04_FRONTEND_STATUS.md"
       - ".github/workflows/oidc-provider.yml"
   push:
-    branches: ["feat/operava-oidc-idp"]
+    branches: ["feat/operava-oidc-idp", "v0.4-frontend"]
 
 permissions:
   contents: read

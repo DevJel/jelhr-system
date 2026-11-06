@@ -122,7 +122,7 @@ The health endpoint confirms binding/configuration presence. It does not send a 
 
 ## Release status and go-live checklist
 
-The v0.4 backend APIs and migration are deployed. The existing frontend is still the v0.3 UI; the v0.4 recruitment, careers, invite acceptance, MFA/passkey, SSO, AI assistant and knowledge-management screens remain unfinished as documented in `UNFINISHED.md`.
+The v0.4 backend APIs and migrations 0001–0004 are deployed. The v0.4 browser implementation is being developed in draft PR #7 (`v0.4-frontend`) and is not merged or deployed. The production Pages site remains on the previously deployed v0.3 frontend until the PR is approved and all release gates in `UNFINISHED.md` pass. Do not point production traffic at the draft branch.
 
 Before real employee or applicant data is entered:
 
@@ -133,7 +133,7 @@ Before real employee or applicant data is entered:
 - [ ] Verify the email OTP is sent only after valid credentials and Turnstile verification.
 - [ ] Verify that `JELHR_SUPERADMIN_EMAIL` and `JELHR_SUPERADMIN_PASSWORD` contain non-empty values in encrypted Pages secrets.
 - [ ] Redeploy and confirm `platformAdmin: true`.
-- [ ] Complete the v0.4 frontend and update the remaining screens before enabling MFA or passkey policies.
+- [ ] Approve and merge draft PR #7 only after its CI checks pass and the browser/device release gates in `UNFINISHED.md` are closed.\n- [ ] Complete TOTP QR, passkey/TOTP/email MFA, SSO and custom-domain browser verification before enabling MFA or passkey policies.
 - [ ] Send and receive a controlled SES test email.
 - [ ] Test R2 upload/download and verify the 5 MB limit.
 - [ ] Test Workers AI inference and organization-scoped knowledge retrieval.

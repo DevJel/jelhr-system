@@ -1,0 +1,1 @@
+var running=false;document.getElementById('timerBtn').addEventListener('click',function(){running=!running;this.textContent=running?'⏸ Pause':'▶ Start timer';this.className=running?'btn btn-dark':'btn btn-accent'});

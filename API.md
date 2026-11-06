@@ -1,0 +1,81 @@
+# JelHR API reference (v0.4)
+
+All tenant APIs are same-origin Pages Functions under `/api`. JSON request and response bodies are used unless a route is a file download. Tenant identity is derived from the authenticated server-side session; callers must not supply an organization ID to select another tenant. State-changing requests require same-origin request metadata.
+
+## Health and public endpoints
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/api/health` | Readiness and binding status; does not prove SES delivery. |
+| GET | `/api/auth/config` | Public login configuration including the Turnstile site key. |
+| GET | `/api/auth/options?workspace=...` | Public sign-in methods for a workspace. |
+| GET | `/api/public/careers?org=slug` | Branded careers content and open jobs. |
+| GET | `/api/public/jobs/:id` | Public job details. |
+| POST | `/api/public/jobs/:id/apply` | Candidate application, résumé and privacy consent. |
+| GET | `/api/public/logo` | Public organization logo. |
+
+## Tenant authentication and account
+
+| Method | Route | Purpose |
+|---|---|---|
+| POST | `/api/auth/login` | Password first factor using email, username or employee ID; workspace may be supplied. |
+| POST | `/api/auth/mfa` | Complete an email OTP, TOTP or passkey challenge. |
+| POST | `/api/auth/passkey` | Discoverable passkey sign-in. |
+| GET | `/api/auth/me` | Current authenticated user/session. |
+| POST | `/api/auth/logout` | Revoke current session. |
+| GET/POST | `/api/mfa` | List and enroll TOTP, email OTP and passkey methods. |
+| DELETE | `/api/mfa/:id` | Remove an enrolled method. |
+| GET | `/api/auth/sso/start` | Begin OIDC authorization-code + PKCE. |
+| GET | `/api/auth/sso/callback` | Complete OIDC sign-in. |
+| GET/POST | `/api/auth/invite` | Inspect invitation, send code and accept invitation. |
+| GET/POST/PATCH | `/api/users`, `/api/users/:id` | List, invite and manage tenant users. |
+
+## People and employee lifecycle
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET/POST | `/api/employees` | List/create employee records. |
+| GET/PATCH | `/api/employees/:id` | Read/update one employee. |
+| GET/POST/DELETE | `/api/employees/:id/documents` | List, upload and delete employee paperwork. |
+| GET | `/api/files/:id` | Authorized private file download. |
+| GET/POST/PATCH | `/api/onboarding`, `/api/onboarding/:id` | Onboarding plans and task completion. |
+| GET/POST/PATCH | `/api/offboarding`, `/api/offboarding/:id` | Offboarding cases, tasks, approvals and closure. |
+| GET/POST/PATCH | `/api/time` | Time clock and timesheet workflows. |
+
+## Recruitment
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET/POST | `/api/jobs` | List/create jobs. |
+| GET/PATCH/DELETE | `/api/jobs/:id` | Read/update/close a job. |
+| GET | `/api/applicants` | List applicants and stages. |
+| GET/PATCH | `/api/applicants/:id` | Read/update applicant. |
+| POST | `/api/applicants/:id/hire` | Convert applicant into employee and start onboarding. |
+| GET/POST | `/api/interviews` | List/schedule interviews. |
+| GET/PATCH/DELETE | `/api/interviews/:id` | Manage an interview. |
+| GET | `/api/recruitment/stats` | Recruitment pipeline counts. |
+
+## AI and knowledge
+
+| Method | Route | Purpose |
+|---|---|---|
+| POST | `/api/ai` | `ask`, `hr_draft`, `rewrite`, `job_description`, `screen_applicant`, `draft_message`, `explain_document`, `summarize_exit`. |
+| GET/POST | `/api/ai/conversations` | List/create conversation. |
+| GET/PATCH/DELETE | `/api/ai/conversations/:id` | Read/update/delete a private conversation. |
+| GET/POST/PATCH/DELETE | `/api/knowledge`, `/api/knowledge/:id` | Manage organization-scoped knowledge sources. |
+
+AI output is advisory. Applicant screening must not make automated hiring decisions. Drafts require authorized human review.
+
+## Workspace settings and platform
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET/PATCH | `/api/settings` | Branding, auth policy, SSO, careers, country and AI profile. |
+| GET | `/api/platform/overview` | Super-admin totals and health. |
+| GET/POST | `/api/platform/organizations` | List/create organizations. |
+| GET/PATCH | `/api/platform/organizations/:id` | Organization status, features and AI quota. |
+| POST | `/api/platform/login` | Separate platform-admin sign-in. |
+
+## Error handling
+
+Errors are JSON and include a stable status code and message. Tenant-scoped records that are absent or outside the caller's organization return 404. Insufficient privileges return 403. Validation failures return 400. Rate limits return 429. Do not expose internal stack traces or secret values to clients.

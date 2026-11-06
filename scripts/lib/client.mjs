@@ -34,7 +34,7 @@ export function client(env, { origin = ORIGIN } = {}) {
     if (origin && !h.has("Origin")) h.set("Origin", origin);
     if (jar.size) h.set("Cookie", [...jar].map(([k, v]) => `${k}=${v}`).join("; "));
     let payload;
-    if (body !== undefined) { payload = JSON.stringify(body); h.set("Content-Type", "application/json"); h.set("Content-Length", String(payload.length)); }
+    if (body !== undefined) { if (method === "POST" && path === "/api/auth/login" && env.__exposeOtp === true && env.TURNSTILE_VERIFIER && body && typeof body === "object" && !body.turnstileToken) body = { ...body, turnstileToken: "local-fixture" }; payload = JSON.stringify(body); h.set("Content-Type", "application/json"); h.set("Content-Length", String(payload.length)); }
     const req = new Request(ORIGIN + path, { method, headers: h, body: payload });
     const handle = await router();
     const res = await handle(req, env);

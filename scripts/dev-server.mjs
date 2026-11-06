@@ -35,7 +35,7 @@ const handle = await createRouter(join(root, "functions"));
 const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".svg": "image/svg+xml", ".webp": "image/webp", ".png": "image/png", ".ico": "image/x-icon", ".json": "application/json", ".webmanifest": "application/manifest+json" };
 const headerRules = readFileSync(join(root, "frontend/_headers"), "utf8").split(/\n(?=\/)/).map(block => {
   const [pattern, ...lines] = block.trim().split("\n");
-  return { re: new RegExp("^" + pattern.trim().replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*") + "$"), headers: lines.map(l => l.trim()).filter(Boolean).map(l => [l.slice(0, l.indexOf(":")), l.slice(l.indexOf(":") + 1).trim()]) };
+  return { re: new RegExp("^" + pattern.trim().replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*") + "$"), headers: lines.map(l => l.trim()).filter(Boolean).map(l => l.startsWith("! ") ? [l.slice(2).trim(), null] : [l.slice(0, l.indexOf(":")), l.slice(l.indexOf(":") + 1).trim()]) };
 });
 
 if (args.includes("--seed") && fresh) {
@@ -70,7 +70,7 @@ createServer(async (req, res) => {
     if (!file.startsWith(join(root, "frontend")) || !existsSync(file) || statSync(file).isDirectory() || /\/_(headers|redirects)$/.test(file)) { file = join(root, "frontend/404.html"); status = 404; }
     res.statusCode = status;
     res.setHeader("Content-Type", TYPES[extname(file)] || "application/octet-stream");
-    for (const rule of headerRules) if (rule.re.test(url.pathname)) for (const [k, v] of rule.headers) if (!/strict-transport|upgrade-insecure/i.test(k + v)) res.setHeader(k, k.toLowerCase() === "content-security-policy" ? v.replace("; upgrade-insecure-requests", "") : v);
+    for (const rule of headerRules) if (rule.re.test(url.pathname)) for (const [k, v] of rule.headers) if (!/strict-transport|upgrade-insecure/i.test(k + String(v))) { if (v === null) res.removeHeader(k); else res.setHeader(k, k.toLowerCase() === "content-security-policy" ? v.replace("; upgrade-insecure-requests", "") : v); }
     res.end(readFileSync(file));
   } catch (e) {
     console.error(e);

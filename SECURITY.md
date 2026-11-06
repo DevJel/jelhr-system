@@ -35,7 +35,7 @@ The organization is **always** derived from the verified session, never from the
 - Errors return a generic message with a request id; details go to the Functions log only.
 
 **Browser**
-- CSP: `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'`. No inline script, style attribute or event handler anywhere (enforced by `tests/static.test.mjs`).
+- CSP is configured in `frontend/_headers`; the public careers route has a narrower Turnstile-specific override. Legacy v0.3 pages still contain inline style attributes, so do not claim a fully strict style CSP until those legacy elements are externalized. Inline scripts are being externalized and checked by `tests/static.test.mjs`.
 - HSTS, `X-Frame-Options: DENY`, `nosniff`, COOP/CORP same-origin, restrictive `Permissions-Policy`.
 - All dynamic markup goes through an escaping template tag; CSV exports neutralise spreadsheet formulas; login `next=` only accepts local page names.
 
@@ -50,7 +50,7 @@ The organization is **always** derived from the verified session, never from the
 ## Known limitations
 
 - **PBKDF2 at 100k** is below OWASP's 600k recommendation for PBKDF2-SHA256; it is the platform ceiling. Long minimum length, rate limits and lockouts compensate. A memory-hard KDF would require a WASM implementation.
-- **No MFA yet.** Add TOTP or passkeys before onboarding large organizations; protect the super admin with a long unique passphrase and Cloudflare Access on `/platform.html` if possible.
+- **MFA is implemented in the v0.4 backend.** Email OTP, TOTP and passkeys are supported by the API; the v0.4 UI is still under review in draft PR #7. Keep enforced MFA policies disabled until enrollment, recovery and login ceremonies have passed real-browser testing. Protect the platform super admin with a long unique passphrase and an independent TOTP secret.
 - **Rate limits live in D1**, not at the edge. Add a Cloudflare WAF rate-limiting rule for `/api/auth/login` and `/api/platform/login` for volumetric protection.
 - **Offboarding records the work, it doesn't do it.** Identity provider, device management and payroll actions still happen in those systems.
 - **Electronic signatures** provide a tamper-evident record (see [docs/e-signature.md](docs/e-signature.md)); they are not qualified/certificate-based digital signatures.
