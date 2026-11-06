@@ -97,3 +97,25 @@ backBtn.addEventListener('click',()=>{
  document.querySelector('#otpCode').value='';showError('');resetTurnstile();
 });
 document.querySelector('#otpCode').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();verifyOtpBtn.click()}});
+
+const passkeyLoginBtn=document.querySelector('#passkeyBtn');
+function fromB64url(s){return Uint8Array.from(atob(String(s).replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((String(s).length+3)%4)),c=>c.charCodeAt(0))}
+function toB64url(b){return btoa(String.fromCharCode(...new Uint8Array(b))).replace(/=/g,'').replace(/\\+/g,'-').replace(/\\//g,'_')}
+passkeyLoginBtn.addEventListener('click',async()=>{
+ showError('');
+ if(!window.PublicKeyCredential||!navigator.credentials){showError('This browser does not support passkeys.');return}
+ setBusy(passkeyLoginBtn,true,'Waiting for your passkey…');
+ try{
+  const o=await fetch('/api/auth/passkey',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'options'})});
+  const d=await o.json().catch(()=>({}));
+  if(!o.ok)throw new Error(d.error||'Passkey sign-in is unavailable');
+  const p=d.publicKey;p.challenge=fromB64url(p.challenge);p.allowCredentials=(p.allowCredentials||[]).map(x=>({...x,id:fromB64url(x.id)}));
+  const c=await navigator.credentials.get({publicKey:p});
+  const credential={id:c.id,rawId:toB64url(c.rawId),type:c.type,clientDataJSON:toB64url(c.response.clientDataJSON),authenticatorData:toB64url(c.response.authenticatorData),signature:toB64url(c.response.signature),userHandle:c.response.userHandle?toB64url(c.response.userHandle):null};
+  const v=await fetch('/api/auth/passkey',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'verify',challengeId:d.challengeId,credential})});
+  const result=await v.json().catch(()=>({}));
+  if(!v.ok)throw new Error(result.error||'Passkey verification failed');
+  location.replace(requestedReturnTo||(result.user&&result.user.role==='employee'?'employee.html':'index.html'));
+ }catch(e){showError(e.message||'Passkey sign-in failed.');}
+ finally{setBusy(passkeyLoginBtn,false,'Sign in with a passkey')}
+});
