@@ -1,8 +1,6 @@
 import { respond, readJson, clientIp } from "../../_shared/http.js";
-import { sha256b64, verifyPassword, dummyPasswordWork, randomToken } from "../../_shared/crypto.js";
-import { loadPolicy } from "../../_shared/authpolicy.js";
-import { findUser, MFA_CHALLENGE_MINUTES } from "../../_shared/login.js";
-import { issueOtp } from "../../_shared/otp.js";
+import { sha256b64, verifyPassword, dummyPasswordWork } from "../../_shared/crypto.js";
+import { findUser, afterFirstFactor } from "../../_shared/login.js";
 
 
 const WINDOW_SECONDS=900, MAX_ATTEMPTS=8, ACCOUNT_LOCK_AFTER=10, ACCOUNT_LOCK_SECONDS=900;
@@ -31,19 +29,14 @@ export async function onRequestPost({request,env}) {
     if(user&&!locked){const failures=(user.failed_login_count||0)+1,until=failures>=ACCOUNT_LOCK_AFTER?new Date(Date.now()+ACCOUNT_LOCK_SECONDS*1000).toISOString():null;ops.push(env.DB.prepare("UPDATE users SET failed_login_count=?,locked_until=? WHERE id=?").bind(until?0:failures,until,user.id));}
     await env.DB.batch(ops);return respond({error:"Those sign-in details are incorrect."},401);
   }
-  const policy=await loadPolicy(env,user.organization_id);
-  if(policy.sso.enabled&&policy.sso.enforced&&user.role!=="owner")return respond({error:"Your organization signs in with single sign-on. Use “Sign in with SSO”.",code:"sso_required"},403);
-  const id=crypto.randomUUID();
+  const policyCheck=await env.DB.prepare("SELECT settings_json FROM organization_settings WHERE organization_id=?").bind(user.organization_id).first();
+  let authSettings={};try{authSettings=JSON.parse(policyCheck?.settings_json||"{}")}catch{}
+  const policy=authSettings.auth||{};
+  if(policy.sso?.enabled&&policy.sso?.enforced&&user.role!=="owner")return respond({error:"Your organization signs in with single sign-on. Use “Sign in with SSO”.",code:"sso_required"},403);
   await env.DB.batch([
     env.DB.prepare("DELETE FROM auth_rate_limits WHERE key=?").bind(rateKey),
     env.DB.prepare("DELETE FROM auth_rate_limits WHERE window_started_at < ? AND (locked_until IS NULL OR locked_until < ?)").bind(now-86400,now),
-    env.DB.prepare("DELETE FROM auth_challenges WHERE expires_at < ?").bind(new Date(Date.now()-86400000).toISOString()),
-    env.DB.prepare("INSERT INTO auth_challenges(id,purpose,user_id,organization_id,challenge,data_json,expires_at) VALUES(?,?,?,?,?,?,?)").bind(id,"mfa",user.id,user.organization_id,randomToken(16),JSON.stringify({authMethod:"password",methods:["email_otp"],bootstrap:false,ipHash}),new Date(Date.now()+MFA_CHALLENGE_MINUTES*60000).toISOString())
+    env.DB.prepare("DELETE FROM auth_challenges WHERE expires_at < ?").bind(new Date(Date.now()-86400000).toISOString())
   ]);
-  try{
-    const sent=await issueOtp(env,user,"login");
-    if(!sent.sent){await env.DB.prepare("UPDATE auth_challenges SET consumed_at=? WHERE id=?").bind(new Date().toISOString(),id).run();return respond({error:"We couldn't send your verification email. Please try again or contact your administrator."},503);}
-  }catch(e){await env.DB.prepare("UPDATE auth_challenges SET consumed_at=? WHERE id=?").bind(new Date().toISOString(),id).run();throw e;}
-  const [local,domain]=user.email.split("@"),hint=domain?local.slice(0,2)+"•".repeat(Math.max(1,local.length-2))+"@"+domain:"your registered email";
-  return respond({emailOtpRequired:true,challengeId:id,emailHint:hint,expiresIn:MFA_CHALLENGE_MINUTES*60});
+  return afterFirstFactor(env,request,user,{authMethod:"password"});
 }
