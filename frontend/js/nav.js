@@ -16,7 +16,7 @@
   document.querySelectorAll('.nav a,.mobile-nav a').forEach(function(a){var file=(a.getAttribute('href')||'').split('/').pop();if(file===path)a.classList.add('active')});
   document.querySelectorAll('a[href="dashboard-full.html"]').forEach(function(a){a.remove()});
   if(['owner','admin','hr_manager'].includes(role)){
-    var links=[['recruitment.html','Recruitment','recruitment'],['assistant.html','Assistant','ai'],['security-v04.html','Security',null]];
+    var links=[['people-v04.html','People directory','people'],['recruitment.html','Recruitment','recruitment'],['assistant.html','Assistant','ai'],['security-v04.html','Security',null]];
     if(['owner','admin'].includes(role)){links.push(['users.html','Users',null],['settings-v04.html','Workspace settings',null])}
     links=links.filter(function(item){return !item[2]||features.has(item[2])});
     var featureRoutes={'recruitment.html':'recruitment','assistant.html':'ai','onboarding.html':'onboarding','offboarding.html':'offboarding','time.html':'time'};
