@@ -13,7 +13,7 @@ on:
       - "V04_FRONTEND_STATUS.md"
       - ".github/workflows/oidc-provider.yml"
   push:
-    branches: ["feat/operava-oidc-idp"]
+    branches: ["feat/operava-oidc-idp", "v0.4-frontend"]
 
 permissions:
   contents: read
