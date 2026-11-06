@@ -15,5 +15,10 @@
   }catch(e){location.replace('login.html');return}
   document.querySelectorAll('.nav a,.mobile-nav a').forEach(function(a){var file=(a.getAttribute('href')||'').split('/').pop();if(file===path)a.classList.add('active')});
   document.querySelectorAll('a[href="dashboard-full.html"]').forEach(function(a){a.remove()});
+  if(['owner','admin','hr_manager'].includes(role)){
+    var links=[['recruitment.html','Recruitment'],['assistant.html','Assistant'],['users.html','Users'],['security-v04.html','Security'],['settings-v04.html','Workspace settings']];
+    document.querySelectorAll('.nav,.top-links').forEach(function(node){links.forEach(function(item){if(!node.querySelector('a[href="'+item[0]+'"]')){var a=document.createElement('a');a.href=item[0];a.textContent=item[1];node.appendChild(a)}})});
+    var select=document.querySelector('#page-select');if(select)links.forEach(function(item){if(!select.querySelector('option[value="'+item[0]+'"]')){var o=document.createElement('option');o.value=item[0];o.textContent=item[1];select.appendChild(o)}});
+  }
   var script=document.createElement('script');script.src='js/app.js';script.defer=true;document.body.appendChild(script);
 })();
