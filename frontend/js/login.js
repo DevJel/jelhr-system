@@ -100,7 +100,7 @@ document.querySelector('#otpCode').addEventListener('keydown',e=>{if(e.key==='En
 
 const passkeyLoginBtn=document.querySelector('#passkeyBtn');
 function fromB64url(s){return Uint8Array.from(atob(String(s).replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((String(s).length+3)%4)),c=>c.charCodeAt(0))}
-function toB64url(b){return btoa(String.fromCharCode(...new Uint8Array(b))).replace(/=/g,'').replace(/\\+/g,'-').replace(/\\//g,'_')}
+function toB64url(b){return btoa(String.fromCharCode(...new Uint8Array(b))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_')}
 passkeyLoginBtn.addEventListener('click',async()=>{
  showError('');
  if(!window.PublicKeyCredential||!navigator.credentials){showError('This browser does not support passkeys.');return}
