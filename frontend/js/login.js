@@ -5,7 +5,10 @@ const credentialsStep=document.querySelector('#credentialsStep'),otpStep=documen
 const verifyOtpBtn=document.querySelector('#verifyOtpBtn'),backBtn=document.querySelector('#backBtn');
 const stepTitle=document.querySelector('#stepTitle'),stepIntro=document.querySelector('#stepIntro');
 const requestedReturnTo=(()=>{const raw=new URLSearchParams(location.search).get('returnTo');if(!raw||!raw.startsWith('/')||raw.startsWith('//'))return null;try{const u=new URL(raw,location.origin);return u.origin===location.origin?u.pathname+u.search+u.hash:null}catch{return null}})();
-let turnstileWidget=null,turnstileToken='',challengeId='',turnstileReady=false,turnstileLoading=false;\nconst workspaceField=document.querySelector('#workspace'),ssoLink=document.querySelector('#ssoLink');\nasync function loadWorkspaceOptions(){const ws=workspaceField.value.trim();if(!ws){ssoLink.hidden=true;return}try{const r=await fetch('/api/auth/options?workspace='+encodeURIComponent(ws),{cache:'no-store'}),d=await r.json();ssoLink.hidden=!(d.found&&d.sso&&d.sso.enabled);ssoLink.href='/api/auth/sso/start?workspace='+encodeURIComponent(ws)}catch{ssoLink.hidden=true}}\nworkspaceField.addEventListener('change',loadWorkspaceOptions);workspaceField.addEventListener('blur',loadWorkspaceOptions);
+let turnstileWidget=null,turnstileToken='',challengeId='',turnstileReady=false,turnstileLoading=false;
+const workspaceField=document.querySelector('#workspace'),ssoLink=document.querySelector('#ssoLink');
+async function loadWorkspaceOptions(){const ws=workspaceField.value.trim();if(!ws){ssoLink.hidden=true;return}try{const r=await fetch('/api/auth/options?workspace='+encodeURIComponent(ws),{cache:'no-store'}),d=await r.json();ssoLink.hidden=!(d.found&&d.sso&&d.sso.enabled);ssoLink.href='/api/auth/sso/start?workspace='+encodeURIComponent(ws)}catch{ssoLink.hidden=true}}
+workspaceField.addEventListener('change',loadWorkspaceOptions);workspaceField.addEventListener('blur',loadWorkspaceOptions);
 function showError(message){error.textContent=message||''}
 function setBusy(control,busy,label){control.disabled=busy;control.textContent=busy?'Please wait…':label}
 function setTurnstileState(ready,label){
