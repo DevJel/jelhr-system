@@ -1,0 +1,1 @@
+fetch('/api/bff/auth/navigation',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(d=>{if(d.user.role!=='auditor')location.replace('index.html')}).catch(()=>location.replace('login.html'));document.querySelector('#logout').onclick=async()=>{await fetch('/api/bff/auth/logout',{method:'POST'});location.replace('login.html')};
