@@ -48,7 +48,7 @@ test("security headers and deployment config", () => {
   assert.match(config, /binding = "DB"/);
   assert.match(config, /database_name = "jelhr-system-db"/);
   assert.doesNotMatch(config, /database_id = "99699f6d-e0e8-4e1c-a161-80dd698761d9"/);
-  assert.ok(!existsSync("src/index.js"), "unused Worker entry must not shadow Pages Functions");
+  assert.doesNotMatch(config, /^main\s*=/m, "Pages config must not declare a Worker entry point");
 });
 
 test("migrations are ordered and additive", () => {
