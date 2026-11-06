@@ -19,10 +19,10 @@ This branch adds the first v0.4 browser interfaces while preserving the existing
 ## Explicitly pending before production go-live
 
 - Browser-level validation and accessibility pass for every new screen.
-- Passkey enrollment and passwordless sign-in UI; WebAuthn APIs exist on the backend but this branch does not yet expose the complete browser ceremony.
+- Browser-level validation of passkey enrollment and passwordless sign-in; the WebAuthn browser ceremonies are now wired to the backend but still need real-device testing.
 - TOTP QR rendering. The current authenticator setup shows the secret and requires manual entry; do not claim QR enrollment is available.
-- Employee drawer paperwork tab with upload/download/delete and contextual document explanation.
-- Full platform organization editor UI for per-organization feature toggles and AI quota changes. The backend endpoint exists; overview is currently read-only for those controls.
+- Integrate the employee paperwork screen into the employee detail drawer and add contextual document explanation; the standalone paperwork route supports upload/download/delete.
+- Improve platform organization editing UX and verify per-organization feature toggles and AI quota changes against a test tenant.
 - Rich careers page content/details, public custom-domain verification and live Turnstile Siteverify smoke test.
 - Full SSO provider round-trip with Entra ID, Google and Okta test tenants.
 - End-to-end email tests for invitations, MFA codes, interviews and candidate confirmations.
