@@ -5,7 +5,7 @@ const credentialsStep=document.querySelector('#credentialsStep'),otpStep=documen
 const verifyOtpBtn=document.querySelector('#verifyOtpBtn'),backBtn=document.querySelector('#backBtn');
 const stepTitle=document.querySelector('#stepTitle'),stepIntro=document.querySelector('#stepIntro');
 const requestedReturnTo=(()=>{const raw=new URLSearchParams(location.search).get('returnTo');if(!raw||!raw.startsWith('/')||raw.startsWith('//'))return null;try{const u=new URL(raw,location.origin);return u.origin===location.origin?u.pathname+u.search+u.hash:null}catch{return null}})();
-let turnstileWidget=null,turnstileToken='',challengeId='',turnstileReady=false,turnstileLoading=false;
+let turnstileWidget=null,turnstileToken='',challengeId='',turnstileReady=false,turnstileLoading=false;\nconst workspaceField=document.querySelector('#workspace'),ssoLink=document.querySelector('#ssoLink');\nasync function loadWorkspaceOptions(){const ws=workspaceField.value.trim();if(!ws){ssoLink.hidden=true;return}try{const r=await fetch('/api/auth/options?workspace='+encodeURIComponent(ws),{cache:'no-store'}),d=await r.json();ssoLink.hidden=!(d.found&&d.sso&&d.sso.enabled);ssoLink.href='/api/auth/sso/start?workspace='+encodeURIComponent(ws)}catch{ssoLink.hidden=true}}\nworkspaceField.addEventListener('change',loadWorkspaceOptions);workspaceField.addEventListener('blur',loadWorkspaceOptions);
 function showError(message){error.textContent=message||''}
 function setBusy(control,busy,label){control.disabled=busy;control.textContent=busy?'Please wait…':label}
 function setTurnstileState(ready,label){
@@ -62,7 +62,7 @@ form.addEventListener('submit',async event=>{
  const token=turnstileToken;
  setBusy(button,true,'Continue');
  try{
-  const r=await fetch('/api/bff/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({identifier:form.elements.identifier.value,password:form.elements.password.value,turnstileToken:token})});
+  const r=await fetch('/api/bff/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({identifier:form.elements.identifier.value,workspace:form.elements.workspace.value,password:form.elements.password.value,turnstileToken:token})});
   const d=await r.json().catch(()=>({}));
   if(!r.ok)throw new Error(d.error||'Unable to sign in');
   if(!d.emailOtpRequired||!d.challengeId)throw new Error('The email verification step could not be started. Please try again.');
