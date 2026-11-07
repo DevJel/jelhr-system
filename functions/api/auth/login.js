@@ -7,8 +7,18 @@ import { loadPolicy } from "../../_shared/authpolicy.js";
 const WINDOW_SECONDS=900, MAX_ATTEMPTS=8, ACCOUNT_LOCK_AFTER=10, ACCOUNT_LOCK_SECONDS=900;
 export async function verifyTurnstile(env,token,ip,hostname,request) {
   if(!token)return false;
-  // Prefer the internal verifier service when configured; otherwise use Siteverify
-  // directly with the encrypted Pages secret. Never accept a client-only widget token.
+  // Direct Siteverify is preferred; it is independently bound to the request host and action.
+  if(env.TURNSTILE_SECRET_KEY){
+    try{
+      const body=new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:String(token),remoteip:String(ip||"")});
+      const r=await (env.__fetch||fetch)("https://challenges.cloudflare.com/turnstile/v0/siteverify",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body,signal:AbortSignal.timeout(5000)});
+      if(!r.ok)return false;
+      const result=await r.json().catch(()=>({}));
+      const expectedHost=String(hostname||new URL(request.url).hostname).toLowerCase();
+      return result.success===true&&String(result.hostname||"").toLowerCase()===expectedHost&&result.action==="login";
+    }catch{return false}
+  }
+  // Compatibility fallback for deployments that still use the internal verifier Worker.
   if(env.TURNSTILE_VERIFIER){
     try{
       const r=await env.TURNSTILE_VERIFIER.fetch("https://turnstile.internal/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,ip,hostname,action:"login"})});
@@ -16,15 +26,7 @@ export async function verifyTurnstile(env,token,ip,hostname,request) {
       return (await r.json().catch(()=>({}))).success===true;
     }catch{return false}
   }
-  if(!env.TURNSTILE_SECRET_KEY)return false;
-  try{
-    const body=new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:String(token),remoteip:String(ip||"")});
-    const r=await (env.__fetch||fetch)("https://challenges.cloudflare.com/turnstile/v0/siteverify",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body,signal:AbortSignal.timeout(5000)});
-    if(!r.ok)return false;
-    const result=await r.json().catch(()=>({}));
-    const expectedHost=String(hostname||new URL(request.url).hostname).toLowerCase();
-    return result.success===true&&String(result.hostname||"").toLowerCase()===expectedHost&&result.action==="login";
-  }catch{return false}
+  return false;
 }
 export async function onRequestPost({request,env}) {
   if(!env.DB||!env.JELHR_JWT_SECRET||env.JELHR_JWT_SECRET.length<32)return respond({error:"Authentication service is not configured."},503);
