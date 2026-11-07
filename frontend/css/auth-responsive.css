@@ -1,0 +1,18 @@
+/* JelHR sign-in responsive and accessible layout */
+html{min-width:320px;min-height:100%;overflow-x:hidden}
+body.auth-page{min-width:320px;min-height:100dvh;overflow-x:hidden}
+.auth-frame{width:100%;min-height:100dvh;display:grid;grid-template-columns:minmax(360px, min(48%,680px)) minmax(0,1fr)}
+.auth-content{width:100%;min-width:0;display:flex;flex-direction:column;justify-content:center;padding:clamp(20px,5vw,76px)}
+.auth-center{width:100%;max-width:460px;margin-inline:auto}
+.auth-center h1{font-size:clamp(26px,3vw,40px);line-height:1.12;overflow-wrap:anywhere}
+.auth-center input,.auth-center select{width:100%;max-width:100%;min-height:46px}
+.auth-center button[type=submit],.auth-center #verifyOtpBtn{width:100%;min-height:48px}
+.auth-visual{min-width:0;min-height:100dvh;background-size:cover;background-position:center;position:relative}
+.auth-visual .visual-label,.auth-visual .visual-card{display:none!important}
+.auth-foot{max-width:460px;margin:24px auto 0;line-height:1.55}
+.auth-error{overflow-wrap:anywhere}
+.auth-center :focus-visible{outline:3px solid #b85d0c;outline-offset:3px}
+@media(min-width:1600px){.auth-frame{grid-template-columns:minmax(480px,42%) minmax(0,1fr)}.auth-content{padding-inline:clamp(64px,7vw,140px)}}
+@media(max-width:900px){.auth-frame{grid-template-columns:minmax(0,1fr)}.auth-content{min-height:100dvh;padding:clamp(18px,6vw,56px)}.auth-visual{display:none}}
+@media(max-width:480px){.auth-content{padding:18px 16px}.auth-center{max-width:none}.auth-center h1{font-size:28px}.turnstile-wrap{overflow-x:auto;justify-content:flex-start}.auth-foot{font-size:12px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}

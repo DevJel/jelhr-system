@@ -5,18 +5,35 @@ import { loadPolicy } from "../../_shared/authpolicy.js";
 
 
 const WINDOW_SECONDS=900, MAX_ATTEMPTS=8, ACCOUNT_LOCK_AFTER=10, ACCOUNT_LOCK_SECONDS=900;
-async function verifyTurnstile(env,token,ip) {
-  if(!env.TURNSTILE_VERIFIER||!token)return false;
-  const r=await env.TURNSTILE_VERIFIER.fetch("https://turnstile.internal/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,ip})});
-  if(!r.ok)return false;
-  return (await r.json().catch(()=>({}))).success===true;
+export async function verifyTurnstile(env,token,ip,hostname,request) {
+  if(!token)return false;
+  // Direct Siteverify is preferred; it is independently bound to the request host and action.
+  if(env.TURNSTILE_SECRET_KEY){
+    try{
+      const body=new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:String(token),remoteip:String(ip||"")});
+      const r=await (env.__fetch||fetch)("https://challenges.cloudflare.com/turnstile/v0/siteverify",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body,signal:AbortSignal.timeout(5000)});
+      if(!r.ok)return false;
+      const result=await r.json().catch(()=>({}));
+      const expectedHost=String(hostname||new URL(request.url).hostname).toLowerCase();
+      return result.success===true&&String(result.hostname||"").toLowerCase()===expectedHost&&result.action==="login";
+    }catch{return false}
+  }
+  // Compatibility fallback for deployments that still use the internal verifier Worker.
+  if(env.TURNSTILE_VERIFIER){
+    try{
+      const r=await env.TURNSTILE_VERIFIER.fetch("https://turnstile.internal/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,ip,hostname,action:"login"})});
+      if(!r.ok)return false;
+      return (await r.json().catch(()=>({}))).success===true;
+    }catch{return false}
+  }
+  return false;
 }
 export async function onRequestPost({request,env}) {
   if(!env.DB||!env.JELHR_JWT_SECRET||env.JELHR_JWT_SECRET.length<32)return respond({error:"Authentication service is not configured."},503);
   const b=await readJson(request,4096),identifier=String(b.identifier??b.email??"").trim(),workspace=String(b.workspace||"").trim(),password=String(b.password||"");
   if(!identifier||identifier.length>254||!password||password.length>256)return respond({error:"Enter your email, username or employee ID, and your password."},400);
   const ip=clientIp(request);
-  if(!await verifyTurnstile(env,b.turnstileToken,ip))return respond({error:"Security verification failed or expired. Please complete Turnstile again."},400);
+  if(!await verifyTurnstile(env,b.turnstileToken,ip,new URL(request.url).hostname,request))return respond({error:"Security verification failed or expired. Please complete Turnstile again."},400);
   const ipHash=await sha256b64(ip),rateKey=await sha256b64(identifier.toLowerCase()+"|"+workspace.toLowerCase()+"|"+ip),now=Math.floor(Date.now()/1000);
   const rate=await env.DB.prepare("SELECT attempts,window_started_at,locked_until FROM auth_rate_limits WHERE key=?").bind(rateKey).first();
   if(rate?.locked_until&&rate.locked_until>now)return respond({error:"Too many attempts. Try again later."},429);

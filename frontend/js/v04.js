@@ -1,1 +1,55 @@
-const V04={async api(path,options={}){const r=await fetch(path,{credentials:"same-origin",cache:"no-store",...options,headers:{"Content-Type":"application/json",...(options.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||d.message||"Request failed ("+r.status+")");return d},async upload(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve({name:file.name,type:file.type,data:String(reader.result).split(",")[1]||""});reader.onerror=()=>reject(new Error("Unable to read file"));reader.readAsDataURL(file)})},esc(value){return String(value??"").replace(/[&<>\"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))},date(value){if(!value)return "—";const d=new Date(value);return Number.isNaN(d.getTime())?String(value):d.toLocaleString()},async me(){return this.api("/api/auth/me")},async gate(){try{return await this.me()}catch{location.replace("/login.html");return null}},message(el,text,kind="error"){if(!el)return;el.className=kind==="success"?"v-success":"v-error";el.textContent=text;el.hidden=false},busy(btn,on,label){if(!btn)return;btn.disabled=on;if(on){btn.dataset.old=btn.textContent;btn.textContent=label||"Please wait…"}else{btn.textContent=btn.dataset.old||btn.textContent}}};window.V04=V04;
+const V04={
+ async api(path,options={}){const r=await fetch(path,{credentials:"same-origin",cache:"no-store",...options,headers:{"Content-Type":"application/json",...(options.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||d.message||"Request failed ("+r.status+")");return d},
+ async upload(file){return new Promise((resolve,reject)=>{if(!file)return reject(new Error("Choose a file first"));const reader=new FileReader();reader.onload=()=>resolve({name:file.name,type:file.type,data:String(reader.result).split(",")[1]||""});reader.onerror=()=>reject(new Error("Unable to read file"));reader.readAsDataURL(file)})},
+ esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))},
+ date(value){if(!value)return "—";const d=new Date(value);return Number.isNaN(d.getTime())?String(value):d.toLocaleString()},
+ async me(){return this.api("/api/auth/me")},
+ async gate(){try{return await this.me()}catch{location.replace("/login.html");return null}},
+ message(el,text,kind="error"){if(!el)return;el.className=kind==="success"?"v-success":"v-error";el.setAttribute("role",kind==="success"?"status":"alert");el.setAttribute("aria-live",kind==="success"?"polite":"assertive");el.textContent=text;el.hidden=false},
+ busy(btn,on,label){if(!btn)return;btn.disabled=on;if(on){btn.dataset.old=btn.textContent;btn.textContent=label||"Please wait…"}else{btn.textContent=btn.dataset.old||btn.textContent}}
+};window.V04=V04;
+
+/* Shared accessibility behavior for static and dynamically rendered app controls. */
+(()=> {
+ let returnFocus=null;
+ const drawers=()=>[...document.querySelectorAll(".v-drawer")];
+ function labelControls(root=document){
+  root.querySelectorAll?.("form input,form select,form textarea").forEach(c=>{
+   if(c.labels?.length||c.getAttribute("aria-label")||c.type==="hidden")return;
+   const label=c.closest(".v-field")?.querySelector("label")||c.parentElement?.querySelector("label");
+   if(label){if(!c.id)c.id="field-"+Math.random().toString(36).slice(2);label.htmlFor=c.id}
+   else if(c.placeholder)c.setAttribute("aria-label",c.placeholder);
+  });
+ }
+ function sync(){
+  labelControls();
+  for(const d of drawers()){
+   const open=d.classList.contains("open");
+   if(open){
+    d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("tabindex","-1");
+    const heading=d.querySelector("h1,h2,h3");
+    if(heading){if(!heading.id)heading.id="dialog-title-"+Math.random().toString(36).slice(2);d.setAttribute("aria-labelledby",heading.id)}
+    const first=d.querySelector('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])');
+    if(first&&d.dataset.focused!=="1"){returnFocus=document.activeElement;d.dataset.focused="1";first.focus({preventScroll:true})}
+   }else{d.removeAttribute("aria-modal");delete d.dataset.focused}
+  }
+  document.querySelectorAll(".v-backdrop").forEach(b=>b.setAttribute("aria-hidden",String(!b.classList.contains("open"))));
+ }
+ new MutationObserver(sync).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["class"]});
+ sync();
+ document.addEventListener("keydown",e=>{
+  const d=drawers().find(x=>x.classList.contains("open"));if(!d)return;
+  if(e.key==="Escape"){const close=d.querySelector("#closeDrawer,[data-close],.close");if(close)close.click();else{d.classList.remove("open");document.querySelector(".v-backdrop.open")?.classList.remove("open")}return}
+  if(e.key==="Tab"){
+   const f=[...d.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(x=>x.offsetParent!==null);
+   if(!f.length){e.preventDefault();d.focus();return}
+   if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f.at(-1).focus()}
+   else if(!e.shiftKey&&document.activeElement===f.at(-1)){e.preventDefault();f[0].focus()}
+  }
+ });
+ document.addEventListener("click",e=>{
+  const close=e.target.closest("#closeDrawer,[data-close],.close");if(!close)return;
+  const d=close.closest(".v-drawer");if(!d)return;
+  d.classList.remove("open");document.querySelector(".v-backdrop.open")?.classList.remove("open");returnFocus?.focus?.();returnFocus=null;
+ });
+})();
