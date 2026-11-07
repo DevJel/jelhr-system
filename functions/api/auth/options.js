@@ -16,6 +16,7 @@ export async function onRequestGet({ request, env }) {
     workspace: { slug: org.slug, name: org.name, brandColor: settings.branding?.color || null, logoFileId: settings.branding?.logoFileId || null },
     identifiers: p.identifiers,
     passkey: p.methods.includes("passkey"),
+    mfa: { level: p.mfa, methods: p.methods },
     sso: { enabled: Boolean(p.sso.enabled && p.sso.issuer && p.sso.clientId), enforced: Boolean(p.sso.enforced) }
   });
 }
