@@ -10,10 +10,22 @@ import * as v from "../../../../_shared/validate.js";
 const RESUME_TYPES = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword", "text/plain"];
 const PER_HOUR = 5;
 
-async function verifyTurnstile(env, token, ip) {
-  if (!env.TURNSTILE_SECRET_KEY) return true;
-  const r = await (env.__fetch || fetch)("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body: new URLSearchParams({ secret: env.TURNSTILE_SECRET_KEY, response: String(token || ""), remoteip: ip }) });
-  return Boolean((await r.json().catch(() => ({}))).success);
+async function verifyTurnstile(env, token, ip, request) {
+  const enabled = Boolean(env.TURNSTILE_SITE_KEY || env.TURNSTILE_SECRET_KEY);
+  if (!enabled) return true; // Careers may be deployed without Turnstile.
+  if (!env.TURNSTILE_SECRET_KEY || !token) return false;
+  try {
+    const r = await (env.__fetch || fetch)("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ secret: env.TURNSTILE_SECRET_KEY, response: String(token), remoteip: ip }),
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!r.ok) return false;
+    const result = await r.json().catch(() => ({}));
+    return result.success === true &&
+      String(result.hostname || "").toLowerCase() === new URL(request.url).hostname.toLowerCase() &&
+      result.action === "careers_apply";
+  } catch { return false; }
 }
 
 // POST /api/public/jobs/:id/apply — public application with résumé upload.
@@ -24,7 +36,7 @@ export async function onRequestPost(context) {
   const b = await readJson(request, 8 * 1024 * 1024);
   if (b.website) return respond({ ok: true }, 201); // honeypot: bots fill hidden fields; pretend success
   const ip = clientIp(request), ipHash = await sha256b64(ip);
-  if (!await verifyTurnstile(env, b.turnstileToken, ip)) throw new HttpError(400, "Please complete the security check and try again.");
+  if (!await verifyTurnstile(env, b.turnstileToken, ip, request)) throw new HttpError(400, "Please complete the security check and try again.");
   const key = await sha256b64("apply|" + org.id + "|" + ip), now = Math.floor(Date.now() / 1000);
   const rate = await env.DB.prepare("SELECT attempts, window_started_at FROM auth_rate_limits WHERE key=?").bind(key).first();
   const fresh = rate && now - rate.window_started_at < 3600;
