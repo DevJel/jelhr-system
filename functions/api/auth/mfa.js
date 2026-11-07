@@ -19,7 +19,7 @@ export async function onRequestPost({ request, env }) {
   if (b.action === "email") {
     if (!methods.includes("email_otp")) throw new HttpError(400, "Email codes aren't allowed for this account");
     const r = await issueOtp(env, user, "login");
-    return respond({ ok: true, sent: r.sent, error: r.error });
+    return respond({ ok: true, sent: r.sent, error: r.error, devCode: r.devCode });
   }
   if (b.action === "passkey_options") {
     if (!methods.includes("passkey")) throw new HttpError(400, "Passkeys aren't set up for this account");
