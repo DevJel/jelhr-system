@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — sign-in backend and agent handoff
+- Expanded public workspace sign-in options to expose the configured MFA level and allowed factor types without exposing secrets or user records.
+- Removed development OTP values from the MFA email-send API response.
+- Blocked password sign-in when the user's organization is suspended or unavailable.
+- Added mandatory agent handoff, authentication contract/test matrix, and production architecture/go-live documentation with Mermaid diagrams.
+- Updated README and API reference to require documentation updates alongside every code change.
+
+# Changelog
+
 ## 0.4.0 — Frontend implementation in review
 
 - Added recruitment workspace, applicant pipeline, interviews and hire/onboard UI.
