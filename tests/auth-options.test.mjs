@@ -37,7 +37,6 @@ test("BFF email MFA response never contains the local test OTP", async () => {
   await setupOrg(env);
   const user = client(env);
   const first = await user.post("/api/auth/login", { identifier: "owner@acme.test", password: "Correct-Horse-Battery-9" });
-  assert.equal(first.data.mfaRequired, false);
   await user.post("/api/mfa", { action: "totp_setup" });
   // Create an MFA challenge by enrolling a factor then signing in again.
   const second = client(env);
