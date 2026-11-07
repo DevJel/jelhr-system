@@ -16,3 +16,102 @@ body.auth-page{min-width:320px;min-height:100dvh;overflow-x:hidden}
 @media(max-width:900px){.auth-frame{grid-template-columns:minmax(0,1fr)}.auth-content{min-height:100dvh;padding:clamp(18px,6vw,56px)}.auth-visual{display:none}}
 @media(max-width:480px){.auth-content{padding:18px 16px}.auth-center{max-width:none}.auth-center h1{font-size:28px}.turnstile-wrap{overflow-x:auto;justify-content:flex-start}.auth-foot{font-size:12px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+
+/* Mobile login: edge-to-edge viewport, no branding strip, no page scrolling. */
+body.auth-page{
+  margin:0!important;
+  min-height:100dvh;
+  height:100dvh;
+  overflow:hidden!important;
+  background:#fff!important;
+  color:#242424;
+}
+body.auth-page .auth-frame{
+  width:100%!important;
+  max-width:none!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  margin:0!important;
+  padding:clamp(16px,3vw,36px)!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+  background:#fff!important;
+}
+body.auth-page .auth-content{background:#fff}
+body.auth-page .auth-center button[type=submit],
+body.auth-page .auth-center #verifyOtpBtn{
+  background:#ffdf59!important;
+  color:#242424!important;
+}
+body.auth-page .auth-center button[type=submit]:hover,
+body.auth-page .auth-center #verifyOtpBtn:hover{background:#ffd52f!important}
+body.auth-page .auth-center input,
+body.auth-page .auth-center select{
+  background:#fff!important;
+  border:1px solid #dedede!important;
+  color:#242424!important;
+}
+body.auth-page .auth-center input:focus,
+body.auth-page .auth-center select:focus{
+  border-color:#d5a900!important;
+  box-shadow:0 0 0 3px #ffdf5938!important;
+}
+@media(max-width:900px){
+  html:has(body.auth-page),body.auth-page{
+    height:100dvh!important;
+    min-height:100dvh!important;
+    overflow:hidden!important;
+  }
+  body.auth-page .auth-frame{
+    display:block!important;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    padding: max(14px,env(safe-area-inset-top)) 18px max(12px,env(safe-area-inset-bottom))!important;
+    overflow:hidden!important;
+    background:#fff!important;
+  }
+  body.auth-page .auth-content{
+    width:100%;
+    height:100%;
+    min-height:0!important;
+    padding:0!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+  }
+  body.auth-page .wordmark{display:none!important}
+  body.auth-page .auth-visual{display:none!important}
+  body.auth-page .auth-center{
+    width:100%;
+    max-width:440px;
+    max-height:100%;
+    margin:auto!important;
+    overflow:visible;
+  }
+  body.auth-page .auth-center h1{font-size:clamp(25px,6vw,32px);margin:0}
+  body.auth-page .auth-center .intro{font-size:14px;margin:5px 0 12px}
+  body.auth-page .auth-center label{font-size:12px;margin:9px 0 5px 10px}
+  body.auth-page .auth-center input,
+  body.auth-page .auth-center select{height:44px;min-height:44px;padding:0 15px}
+  body.auth-page .auth-center button{height:46px;min-height:46px;margin-top:12px;font-size:15px}
+  body.auth-page .auth-center .auth-secondary{height:40px;min-height:40px;margin-top:4px}
+  body.auth-page .turnstile-wrap{min-height:60px;margin:8px 0 2px}
+  body.auth-page .auth-foot{display:none!important}
+  body.auth-page .auth-error{min-height:18px;margin:4px 8px;font-size:12px}
+}
+@media(max-width:380px){
+  body.auth-page .auth-frame{padding-inline:14px!important}
+  body.auth-page .auth-center .intro{margin-bottom:8px}
+  body.auth-page .auth-center label{margin-top:7px}
+  body.auth-page .turnstile-wrap{min-height:56px}
+  body.auth-page .auth-center button{margin-top:9px}
+}
+@media(max-height:640px) and (max-width:900px){
+  body.auth-page .auth-center h1{font-size:24px}
+  body.auth-page .auth-center .intro{margin:3px 0 7px}
+  body.auth-page .auth-center label{margin-top:5px}
+  body.auth-page .auth-center input,
+  body.auth-page .auth-center select{height:40px;min-height:40px}
+  body.auth-page .auth-center button{height:42px;min-height:42px;margin-top:7px}
+  body.auth-page .turnstile-wrap{min-height:52px;margin:5px 0 0}
+}
