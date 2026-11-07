@@ -47,6 +47,8 @@ export async function onRequestPost({request,env}) {
     if(user&&!locked){const failures=(user.failed_login_count||0)+1,until=failures>=ACCOUNT_LOCK_AFTER?new Date(Date.now()+ACCOUNT_LOCK_SECONDS*1000).toISOString():null;ops.push(env.DB.prepare("UPDATE users SET failed_login_count=?,locked_until=? WHERE id=?").bind(until?0:failures,until,user.id));}
     await env.DB.batch(ops);return respond({error:"Those sign-in details are incorrect."},401);
   }
+  const organization=await env.DB.prepare("SELECT status FROM organizations WHERE id=?").bind(user.organization_id).first();
+  if(!organization||organization.status!=="active")return respond({error:"This workspace is unavailable. Contact your administrator."},403);
   const policy=await loadPolicy(env,user.organization_id);
   if(policy.sso.enabled&&policy.sso.enforced&&user.role!=="owner")return respond({error:"Your organization signs in with single sign-on. Use “Sign in with SSO”.",code:"sso_required"},403);
   await env.DB.batch([
