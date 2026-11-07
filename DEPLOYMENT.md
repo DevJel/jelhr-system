@@ -44,14 +44,14 @@ The following bindings are configured for the production Pages Functions environ
 | `AI` | Workers AI | HR assistant, screening and document conversion |
 | `VECTORIZE` | Vectorize `jelhr-knowledge` (768 dimensions, cosine) | Optional semantic retrieval, organization namespace isolation |
 | `MAILER` | Worker service `jelhr-mailer` | Internal SES SMTP delivery |
-| `TURNSTILE_VERIFIER` | Internal Turnstile verification Worker service | Server-side validation of login challenge tokens |
+| `TURNSTILE_SECRET_KEY` | Encrypted Pages secret | Server-side Cloudflare Siteverify for login and optional careers challenges |
 
-The login page obtains its public widget site key from `GET /api/auth/config`, which reads the production Pages variable `TURNSTILE_SITE_KEY`. The login API sends the submitted token and client IP to `env.TURNSTILE_VERIFIER.fetch("https://turnstile.internal/verify")` and fails closed unless the verifier returns `success: true`.
+The login page obtains its public widget site key from `GET /api/auth/config`, which reads the production Pages variable `TURNSTILE_SITE_KEY`. The login API sends the submitted token and client IP directly to Cloudflare Siteverify using the encrypted `TURNSTILE_SECRET_KEY`. It fails closed unless Siteverify returns `success: true`, the hostname matches the request hostname, and the action is `login`. The careers application endpoint similarly checks the `careers_apply` action when Turnstile is enabled.
 
 Production Pages configuration must therefore include:
 
 - `TURNSTILE_SITE_KEY` — public Turnstile site key, configured as a Pages production variable (not a secret).
-- `TURNSTILE_VERIFIER` — service binding to the existing internal verification Worker. The Worker must expose the internal `POST /verify` contract and perform Cloudflare Siteverify using its own protected secret. Do not put the Turnstile secret in frontend code, GitHub, or a public Pages variable.
+- `TURNSTILE_SECRET_KEY` — encrypted Pages secret. Required for login Turnstile verification. Never put this value in frontend code, GitHub, or a plaintext Pages variable.
 
 Register the production Pages hostname (`jelhr-system-213.pages.dev`) and any production custom hostname actually used by the login page in the Turnstile widget's allowed domains. Do not add localhost to the production hostname allowlist. Keep the service binding and site key configured in the production environment, not only preview environments.
 
@@ -89,7 +89,7 @@ The Pages production configuration lists encrypted secret entries for `JELHR_SUP
 - `JELHR_SUPERADMIN_EMAIL`
 - `JELHR_SUPERADMIN_PASSWORD` (minimum 16 characters)
 
-Optional: `JELHR_SUPERADMIN_TOTP_SECRET`.
+Optional: `JELHR_SUPERADMIN_TOTP_SECRET`, `JELHR_WEBAUTHN_RP_ID`, `JELHR_WEBAUTHN_ORIGINS`, `AI_API_BASE`, `AI_API_KEY`, `ANTHROPIC_API_KEY`. `TURNSTILE_SITE_KEY` is public; `TURNSTILE_SECRET_KEY` must be encrypted and present for login.
 
 Do not reuse credentials from another Operava application. After setting these secrets, trigger a production redeployment and verify `platformAdmin: true` from the health endpoint.
 
