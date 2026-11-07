@@ -1,3 +1,20 @@
+# JelHR System — agent and release entry point
+
+> **Mandatory for every new coding agent:** read [Agent Handoff](docs/AGENT_HANDOFF.md) before making changes. It defines repository ownership, security rules, branch workflow, file structure, documentation requirements, cross-system JWT constraints and release-status discipline. No prior chat memory is required.
+
+## Current engineering references
+- [Authentication and sign-in API/backend](docs/authentication-and-sign-in.md)
+- [Production architecture and go-live plan](docs/production-plan.md)
+- [API reference](API.md)
+- [Architecture](docs/architecture.md)
+- [Deployment runbook](DEPLOYMENT.md)
+- [Security policy](SECURITY.md)
+- [RBAC matrix](RBAC.md)
+
+**Documentation rule:** every feature, API, security, schema, UI, or deployment change must be reflected in this README and its relevant detailed documentation in the same pull request. Include Mermaid diagrams whenever architecture or a significant flow changes.
+
+---
+
 # JelHR System
 
 **JelHR** is a multi-tenant Human Resources Information System (HRIS) designed to support the employee lifecycle: recruitment, applicant screening, hiring, onboarding, employee administration, time tracking, documents, communications, electronic signatures and offboarding.
