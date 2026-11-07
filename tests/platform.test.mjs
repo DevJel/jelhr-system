@@ -71,8 +71,9 @@ test("suspending an organization revokes access", async () => {
   assert.equal((await platform.patch(`/api/platform/organizations/${orgId}`, { status: "suspended" })).status, 200);
   assert.equal((await owner.get("/api/employees")).status, 401);
   const again = client(env);
-  await again.post("/api/auth/login", { email: "owner@acme.test", password: PASSWORD });
-  assert.equal((await again.get("/api/employees")).status, 403);
+  const blocked = await again.post("/api/auth/login", { email: "owner@acme.test", password: PASSWORD });
+  assert.equal(blocked.status, 403);
+  assert.equal(blocked.headers.get("Set-Cookie"), null, "suspended workspaces must not receive a session cookie");
 });
 
 test("employees only see their own workspace; auditors are read-only", async () => {
