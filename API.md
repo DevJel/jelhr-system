@@ -79,3 +79,18 @@ AI output is advisory. Applicant screening must not make automated hiring decisi
 ## Error handling
 
 Errors are JSON and include a stable status code and message. Tenant-scoped records that are absent or outside the caller's organization return 404. Insufficient privileges return 403. Validation failures return 400. Rate limits return 429. Do not expose internal stack traces or secret values to clients.
+
+
+## Sign-in options contract and security notes
+
+`GET /api/auth/options?workspace=<slug>` returns public workspace branding, allowed identifier types, MFA policy level/methods, passkey availability and SSO availability. It returns `found:false` for missing or inactive workspaces. This response is configuration for rendering only; the backend reloads and enforces policy during login.
+
+`POST /api/auth/login` requires `identifier`, `password`, `turnstileToken`, and optionally `workspace`. It verifies Turnstile against the request hostname and the `login` action, rate-limits attempts, verifies credentials, rejects suspended organizations and returns either an HttpOnly session cookie or an MFA challenge. Credential failures use a generic message.
+
+`POST /api/auth/mfa` actions:
+- `{ "action":"email", "challengeId":"…" }` sends a short-lived email OTP. The response contains delivery status only; never an OTP value.
+- `{ "action":"passkey_options", "challengeId":"…" }` returns WebAuthn assertion request options for enrolled credentials.
+- `{ "action":"verify", "challengeId":"…", "method":"email_otp|totp", "code":"…" }` verifies a code.
+- `{ "action":"verify", "challengeId":"…", "method":"passkey", "credential":{…} }` verifies a WebAuthn assertion.
+
+Authentication challenge and session responses must be non-cacheable. Never expose OTPs, TOTP secrets, SSO client secrets, session tokens, password hashes or internal errors. The full flow and required test matrix are documented in [docs/authentication-and-sign-in.md](docs/authentication-and-sign-in.md).
