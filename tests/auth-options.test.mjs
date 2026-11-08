@@ -34,11 +34,13 @@ test("public sign-in options do not reveal unknown or inactive workspaces", asyn
 
 test("BFF email MFA response never contains the local test OTP", async () => {
   const env = makeEnv();
-  await setupOrg(env);
+  const { owner } = await setupOrg(env);
+  // MFA is off by default, so require it for admins before expecting a challenge.
+  await owner.patch("/api/settings", { auth: { mfa: "admins", methods: ["totp", "email_otp"] } });
   const user = client(env);
-  const first = await user.post("/api/auth/login", { identifier: "owner@acme.test", password: "Correct-Horse-Battery-9" });
+  await user.post("/api/auth/login", { identifier: "owner@acme.test", password: "Correct-Horse-Battery-9" });
   await user.post("/api/mfa", { action: "totp_setup" });
-  // Create an MFA challenge by enrolling a factor then signing in again.
+  // Sign in again with a fresh client to create an MFA challenge.
   const second = client(env);
   const step = await second.post("/api/auth/login", { identifier: "owner@acme.test", password: "Correct-Horse-Battery-9" });
   assert.equal(step.data.mfaRequired, true);
