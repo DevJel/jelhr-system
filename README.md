@@ -71,6 +71,12 @@ The production deployment is hosted on **Cloudflare Pages in the Jelvan - Busine
 
 ---
 
+## Live time and onboarding workflows
+
+`/time.html` and `/onboarding.html` use authenticated same-origin APIs rather than browser-local demo data. Employees can record time and view their own tasks; managers can review their direct reports; HR can create onboarding plans and tasks. The dashboard and employee workspace link to these pages. Timesheet date filters use UTC; entries default to the last 30 days and are limited to 1,000 per query; onboarding lists are limited to 2,000 tasks. These limits do not imply full pagination or real-time cross-tab updates. Reload to see changes made in another session.
+
+These changes do not implement payroll, attendance, leave, projects, or cross-system synchronization. Production use requires the security and deployment checks in [UNFINISHED.md](UNFINISHED.md) and [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ## Product scope
 
 | Domain | Capabilities represented in the current codebase |
