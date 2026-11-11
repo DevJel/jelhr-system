@@ -20,7 +20,7 @@ export function aiStatus(env) {
   if (provider === "workers-ai") return env.AI ? { provider, configured: true, model: env.AI_MODEL || DEFAULT_WORKERS_MODEL, detail: "Cloudflare Workers AI" } : { provider, configured: false, detail: "Add the AI binding ([ai] binding = \"AI\") to wrangler.toml" };
   if (provider === "openai") return { provider, configured: Boolean(env.AI_API_KEY && env.AI_MODEL), model: env.AI_MODEL || null, detail: env.AI_API_KEY ? `OpenAI-compatible API (${env.AI_API_BASE || "api.openai.com"})` : "Set AI_API_KEY and AI_MODEL" };
   if (provider === "anthropic") return { provider, configured: Boolean(env.ANTHROPIC_API_KEY), model: env.AI_MODEL || "claude-haiku-5-5", detail: env.ANTHROPIC_API_KEY ? "Anthropic API" : "Set ANTHROPIC_API_KEY" };
-  if (provider === "mock") return env.JELHR_ENV === "production" ? { provider, configured: false, detail: "The mock AI provider is disabled in production" } : { provider, configured: true, model: "mock", detail: "Development mock — replies are canned examples" };
+  if (provider === "mock") return ["development", "test"].includes(env.JELHR_ENV) ? { provider, configured: true, model: "mock", detail: "Development mock — replies are canned examples" } : { provider, configured: false, detail: "The mock AI provider requires an explicit development or test environment" };
   return { provider: null, configured: false, detail: "AI is not configured. Bind Workers AI or set AI_PROVIDER." };
 }
 

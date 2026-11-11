@@ -23,8 +23,8 @@ export function emailStatus(env) {
     return { provider, configured: ok, from: ok ? from : null, detail: ok ? `SMTP ${env.SMTP_HOST}:${env.SMTP_PORT || 465}` : "Set EMAIL_FROM, SMTP_HOST, SMTP_PORT, SMTP_USERNAME and SMTP_PASSWORD" };
   }
   if (provider === "log") {
-    const ok = env.JELHR_ENV !== "production";
-    return { provider, configured: ok, from: from || "no-reply@example.test", detail: ok ? "Development log mode — emails are recorded, not delivered" : "The log provider is disabled in production" };
+    const ok = ["development", "test"].includes(env.JELHR_ENV);
+    return { provider, configured: ok, from: from || "no-reply@example.test", detail: ok ? "Development log mode — emails are recorded, not delivered" : "The log provider is disabled in production or when the environment is not explicitly development or test" };
   }
   return { provider: provider || null, configured: false, from: null, detail: "Email is not configured. Set EMAIL_PROVIDER to ses or smtp." };
 }
