@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — remove mock production paths
+
+- Redirect legacy sample-data pages to existing authenticated workflows and replace the auditor demo with a tenant-scoped, read-only audit view.
+- Disable mock AI and log-only mail outside explicitly configured development/test environments; restrict OTP test disclosure to explicit tests.
+- Retain synthetic fixtures for tests. No data migration or deployment is performed.
+
+
 ## Unreleased — synced time and onboarding workflows
 
 - Replaced demo time and onboarding pages with authenticated, persisted workflows and linked them from the dashboard and employee workspace.

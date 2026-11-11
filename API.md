@@ -1,5 +1,10 @@
 # JelHR API reference (v0.4)
 
+## Unreleased: audit browser workflow
+
+`GET /api/audit?limit=100` returns the current tenant's audit entries to authenticated owner, admin or auditor roles. The audit browser view renders this existing API; authorization and tenant scope remain server-enforced. This change adds no endpoint or migration.
+
+
 All tenant APIs are same-origin Pages Functions under `/api`. JSON request and response bodies are used unless a route is a file download. Tenant identity is derived from the authenticated server-side session; callers must not supply an organization ID to select another tenant. State-changing requests require same-origin request metadata.
 
 ## Health and public endpoints
