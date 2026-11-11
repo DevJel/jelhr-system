@@ -1,5 +1,23 @@
 # JelHR System architecture
 
+## Unreleased audit view
+
+```mermaid
+sequenceDiagram
+  participant B as Auditor browser
+  participant F as Authenticated Pages Functions
+  participant D as Tenant-scoped D1 audit records
+  B->>F: GET /api/bff/auth/navigation
+  F-->>B: Session role and available features
+  B->>F: GET /api/audit?limit=100
+  F->>D: Authorized current-tenant query
+  D-->>F: Audit entries
+  F-->>B: Read-only audit results
+```
+
+Legacy demo and sample-data URLs redirect to real authenticated workflows; the mock providers require an explicit nonproduction environment. This diagram describes unreleased code, not a verified deployment.
+
+
 ## Deployment boundary
 
 Cloudflare Pages in the Jelvan - Business - Operava account serves the static application from `frontend/`. Pages Functions in the repository-level `functions/` directory handle API routes. The production bindings are `DB` (D1), `FILES` (R2), `AI` (Workers AI), `VECTORIZE` (Vectorize) and `MAILER` (internal SES mailer Worker). The Wrangler file is the source of truth for resource bindings. Preview deployments remain disabled until separate preview resources are provisioned.

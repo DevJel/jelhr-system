@@ -23,8 +23,8 @@ export async function issueOtp(env, user, purpose) {
   const subject = purpose === "invite" ? `Your ${org.orgName} JelHR invitation code` : `Your JelHR sign-in code`;
   const text = `Your verification code is ${code}\n\nIt expires in ${TTL_MINUTES} minutes. If you didn't request it, you can ignore this email — your account is safe.`;
   const mail = await sendEmail(env, { to: user.email, toName: user.display_name, subject, text, html: renderEmailHtml({ subject, text, orgName: org.orgName, footer: org.footer }), fromName: org.senderName });
-  if (env.JELHR_ENV !== "production" && env.EMAIL_PROVIDER === "log") console.log(JSON.stringify({ devOtp: code, to: user.email, purpose }));
-  return { sent: mail.ok, error: mail.ok ? undefined : mail.error, devCode: env.__exposeOtp ? code : undefined };
+  if (env.JELHR_ENV === "development" && env.EMAIL_PROVIDER === "log") console.log(JSON.stringify({ devOtp: code, to: user.email, purpose }));
+  return { sent: mail.ok, error: mail.ok ? undefined : mail.error, devCode: env.JELHR_ENV === "test" && env.__exposeOtp === true ? code : undefined };
 }
 
 export async function verifyOtp(env, userId, purpose, code) {

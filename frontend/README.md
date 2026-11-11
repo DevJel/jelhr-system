@@ -1,37 +1,7 @@
-# JelHR System – Frontend
+# JelHR frontend
 
-## Multi-page app (new)
+The Pages application uses authenticated, same-origin APIs for the dashboard, people directory, time, onboarding, security and settings. Auditor activity uses the read-only, tenant-scoped audit API. Legacy `employees.html`, `security.html`, `settings.html` and `demo.html` URLs redirect to the corresponding current screens; they no longer supply sample records.
 
-| Page | File | Description |
-|------|------|-------------|
-| Dashboard | `index.html` | Overview, stats, schedule, onboarding snapshot |
-| Employees | `employees.html` | People directory table |
-| Time Tracking | `time.html` | Timer + weekly chart |
-| Onboarding | `onboarding.html` | Task checklist & progress |
-| Security | `security.html` | Risk score, sessions, devices |
-| Settings | `settings.html` | Profile & company |
-| Full UI Artifact | `dashboard-full.html` | Original large React design (rename from previous index if needed) |
+The legacy browser-local mock application and navigation scripts have been removed. Synthetic fixtures remain in the test and development tooling and must not be used as production data. Refer to the root README, `SECURITY.md` and `DEPLOYMENT.md` for configuration and production release gates.
 
-Shared:
-- `css/app.css` – design system (black / cream / yellow)
-- `js/nav.js` – active link highlighting
-- Sidebar (desktop) + bottom nav (mobile)
-
-## Run locally
-
-```bash
-npm run dev
-# open http://localhost:3000
-```
-
-## Original React artifact
-
-If you still have the large single-file React dashboard:
-
-1. Rename it to `dashboard-full.html` (or keep as backup).
-2. The sidebar link **Full UI Artifact** points to it.
-
-```bash
-# example if your big file is still named index.html from before:
-# mv index.html dashboard-full.html   # then restore the new multi-page index.html from git if needed
-```
+Run the automated checks from the repository root with `npm test` and `npm run test:ui`. Browser, provider, security and operational verification remain required before a production release.

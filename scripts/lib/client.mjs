@@ -18,6 +18,7 @@ export function makeEnv(extra = {}) {
     JELHR_JWT_SECRET: "test-secret-0123456789-abcdefghijklmnopqrstuvwxyz",
     JELHR_SUPERADMIN_EMAIL: SUPER.email,
     JELHR_SUPERADMIN_PASSWORD: SUPER.password,
+    JELHR_ENV: "test",
     EMAIL_PROVIDER: "log",
     EMAIL_FROM: "hr@jelhr.test",
     TURNSTILE_VERIFIER: { fetch: async () => Response.json({ success: true }) }, // deterministic local test verifier only

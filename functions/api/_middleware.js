@@ -1,4 +1,4 @@
-// API middleware: error handling, CSRF/Origin enforcement, body limits, read-only demo role.
+// API middleware: error handling, CSRF/Origin enforcement, body limits, read-only auditor role.
 import { respond, HttpError, BASE_HEADERS } from "../_shared/http.js";
 import { ResponseError, readSessionToken, requireUser } from "../_shared/auth.js";
 import { verifyJwt } from "../_shared/crypto.js";
@@ -52,11 +52,11 @@ export async function onRequest(context) {
       if (length > 0 && !type.toLowerCase().startsWith("application/json")) {
         return respond({ error: "Content-Type must be application/json" }, 415);
       }
-      // Demo/auditor accounts are strictly read-only (logout and own password excepted).
+      // Auditor accounts are strictly read-only (logout and own password excepted).
       if (!COOKIELESS.has(url.pathname) && !isPublic(url.pathname) && !url.pathname.startsWith("/api/platform/") && !["/api/auth/logout", "/api/auth/password", "/api/bff/auth/logout"].includes(url.pathname)) {
         const token = readSessionToken(request);
         const payload = token && env.JELHR_JWT_SECRET ? await verifyJwt(token, env.JELHR_JWT_SECRET) : null;
-        if (payload?.role === "auditor") return respond({ error: "Demo accounts are read-only" }, 403);
+        if (payload?.role === "auditor") return respond({ error: "Auditor accounts are read-only" }, 403);
       }
     }
     const response = await context.next();

@@ -1,5 +1,10 @@
 # JelHR v0.4 — frontend implementation status
 
+## Production-data cleanup (unreleased)
+
+Legacy mock employee, settings, security and demo views have been removed or redirected to existing authenticated workflows. An auditor view uses the tenant-scoped audit API. Development and test fixtures remain isolated from production configuration. This cleanup is not a production-readiness assessment or a deployment: verify the security, operations and provider gates below before real use, and address the feature gaps in the workflow sync update.
+
+
 ## Workflow sync update (unreleased)
 
 The time and onboarding screens now call their existing tenant APIs instead of using browser-local sample data. The dashboard and employee workspace link to them. This is not a claim that every JelHR feature is synchronized or production-ready. Payroll, attendance, leave, projects, invoices, payslips, meetings and external system synchronization are not provided by these changes. Pagination and real-time cross-session refresh are not implemented. Complete the release gates below using synthetic data before production.

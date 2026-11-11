@@ -1,5 +1,10 @@
 # JelHR System — agent and release entry point
 
+## Unreleased production-data cleanup
+
+Legacy employee, settings, security and demo URLs now redirect to authenticated, API-backed pages. Auditors have a tenant-scoped, read-only audit screen. Mock AI and log-only email providers require an explicitly set development or test environment; OTP test values are only exposed in explicit tests. Test fixtures remain for automated verification. This change does not establish production readiness or deploy the application; the release gates in `DEPLOYMENT.md` and remaining feature gaps in `UNFINISHED.md` still apply. Earlier release-status notes below are historical and must not be used as evidence of the current deployment.
+
+
 > **Mandatory for every new coding agent:** read [Agent Handoff](docs/AGENT_HANDOFF.md) before making changes. It defines repository ownership, security rules, branch workflow, file structure, documentation requirements, cross-system JWT constraints and release-status discipline. No prior chat memory is required.
 
 ## Current engineering references
