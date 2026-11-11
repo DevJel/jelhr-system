@@ -12,7 +12,7 @@ window.Workflow = (() => {
     const user = data.user || {};
     document.querySelectorAll('[data-feature]').forEach(el => { el.hidden = !(user.features || []).includes(el.dataset.feature); });
     const home = $('#homeLink');
-    home.href = user.role === 'employee' ? '/employee.html' : user.role === 'auditor' ? '/demo.html' : '/index.html';
+    home.href = user.role === 'employee' ? '/employee.html' : user.role === 'auditor' ? '/audit.html' : '/index.html';
     home.textContent = user.role === 'employee' ? 'My workspace' : 'Dashboard';
     $('#logout').addEventListener('click', async event => {
       event.currentTarget.disabled = true;

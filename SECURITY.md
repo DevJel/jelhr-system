@@ -1,5 +1,10 @@
 # Security
 
+## Unreleased: production-data safeguards
+
+The mock AI and log email providers are disabled unless `JELHR_ENV` is explicitly `development` or `test`. OTP values are exposed only when both the environment is explicitly `test` and the test hook is enabled; development email logging is not a production delivery mechanism. Auditors can read the server-authorized, tenant-scoped audit log but cannot perform tenant writes. No existing live data is deleted by this change.
+
+
 JelHR stores personal data (contact details, employment status, exit-interview notes, signatures). This document describes the controls in place and the limits you should know before going live.
 
 ## Reporting a vulnerability

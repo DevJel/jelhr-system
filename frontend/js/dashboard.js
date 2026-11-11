@@ -53,7 +53,7 @@
     try {
       const { user } = await request('/api/bff/auth/navigation');
       if (user.role === 'employee') { location.replace('/employee.html'); return; }
-      if (user.role === 'auditor') { location.replace('/demo.html'); return; }
+      if (user.role === 'auditor') { location.replace('/audit.html'); return; }
       if (!['owner','admin','hr_manager','manager'].includes(user.role)) { location.replace('/employee.html'); return; }
       const features = new Set(['people', ...(user.features || [])]), admin = ['owner','admin'].includes(user.role);
       document.querySelectorAll('[data-feature]').forEach(el => { if (!features.has(el.dataset.feature)) el.hidden = true; });
