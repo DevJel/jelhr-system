@@ -1,5 +1,7 @@
 # Changelog
 
+Cloudflare Pages canonical extensionless URLs and `.html` URLs are both supported by legacy redirects and client navigation guards. Server authorization remains authoritative.
+
 ## Unreleased — remove mock production paths
 
 - Redirect legacy sample-data pages to existing authenticated workflows and replace the auditor demo with a tenant-scoped, read-only audit view.
