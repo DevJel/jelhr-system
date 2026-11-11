@@ -5,4 +5,5 @@ const routes = Object.freeze({
  '/settings.html':'/settings-v04.html',
  '/demo.html':'/audit.html'
 });
-location.replace(routes[location.pathname] || '/index.html');
+const path = location.pathname.replace(/\/+$/, '');
+location.replace(routes[path] || routes[path + '.html'] || '/index.html');

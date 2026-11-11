@@ -1,5 +1,7 @@
 # JelHR production deployment — Operava Business
 
+Cloudflare Pages canonical extensionless URLs and `.html` URLs are both supported by legacy redirects and client navigation guards. Server authorization remains authoritative.
+
 ## Unreleased cleanup deployment notes
 
 Set `JELHR_ENV=production` for production. Mock AI and log-only email are unavailable there (and when the environment is unspecified); configure and verify real providers separately. The audit view reads the existing tenant-scoped audit endpoint. No migration is required for this cleanup; rollback by restoring the previous application release. Merge, deploy and exercise the release gates below separately before using real HR data. Local synthetic tests are not proof of production readiness.

@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {existsSync,readFileSync} from 'node:fs';
+import {runInNewContext} from 'node:vm';
 import {makeEnv,client,setupOrg,addEmployee,employeeLogin} from './helpers.mjs';
 import {aiStatus,runAI} from '../functions/_shared/ai.js';
 import {emailStatus} from '../functions/_shared/email.js';
@@ -45,4 +46,22 @@ test('legacy routes no longer load browser-local fabricated data',()=>{
  }
  assert.match(readFileSync('frontend/js/audit.js','utf8'),/\/api\/audit\?limit=100/);
  assert.match(readFileSync('frontend/js/v04-nav.js','utf8'),/security-v04\.html/);
+});
+
+
+test('Cloudflare extensionless routes preserve legacy redirects and navigation guards',async()=>{
+ const legacy=readFileSync('frontend/js/legacy-redirect.js','utf8');
+ for(const [name,dest] of [['employees','people-v04'],['security','security-v04'],['settings','settings-v04'],['demo','audit']]){
+  for(const suffix of ['', '.html']){let target;runInNewContext(legacy,{location:{pathname:'/'+name+suffix,replace:v=>target=v}});assert.equal(target,'/'+dest+'.html');}
+ }
+ const nav=readFileSync('frontend/js/v04-nav.js','utf8');
+ async function redirect(path,role,features=[]){const targets=[];runInNewContext(nav,{location:{pathname:path,replace:v=>targets.push(v)},fetch:async()=>({ok:true,json:async()=>({user:{role,features}})}),document:{querySelectorAll:()=>[]}});await new Promise(resolve=>setImmediate(resolve));return targets;}
+ for(const suffix of ['', '.html']){
+  assert.deepEqual(await redirect('/security-v04'+suffix,'auditor'),[]);
+  assert.deepEqual(await redirect('/employee-documents'+suffix,'employee'),[]);
+  assert.deepEqual(await redirect('/settings-v04'+suffix,'employee'),['/employee.html']);
+  assert.deepEqual(await redirect('/settings-v04'+suffix,'manager'),['/index.html']);
+  assert.deepEqual(await redirect('/assistant'+suffix,'manager'),['/index.html']);
+  assert.deepEqual(await redirect('/assistant'+suffix,'manager',['ai']),[]);
+ }
 });
