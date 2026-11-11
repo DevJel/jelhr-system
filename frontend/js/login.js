@@ -61,6 +61,7 @@ function loadTurnstile(siteKey){
 })();
 form.addEventListener('submit',async event=>{
  event.preventDefault();showError('');
+ if(!form.elements.identifier.value.trim() || !form.elements.password.value){showError('Enter your email, username or employee ID, and your password.');return}
  if(!turnstileToken||!turnstileReady){showError('Complete the Cloudflare security verification first.');return}
  const token=turnstileToken;
  setBusy(button,true,'Continue');
@@ -71,7 +72,7 @@ form.addEventListener('submit',async event=>{
   if(d.user){location.replace(requestedReturnTo||(d.user.role==='employee'?'employee.html':'index.html'));return}
   if(!d.mfaRequired||!d.challengeId)throw new Error('The next sign-in step could not be started. Please try again.');
   challengeId=d.challengeId;credentialsStep.hidden=true;otpStep.hidden=false;stepTitle.textContent='Verify your identity';stepIntro.textContent='Complete the verification method required by your workspace';
-  methodSelect.innerHTML=(d.methods||[]).map(m=>'<option value="'+m+'">'+({email_otp:'Email code',totp:'Authenticator app',passkey:'Passkey'}[m]||m)+'</option>').join('');
+  methodSelect.innerHTML=(d.methods||[]).filter(m=>['email_otp','totp','passkey'].includes(m)).map(m=>'<option value="'+m+'">'+({email_otp:'Email code',totp:'Authenticator app',passkey:'Passkey'}[m])+'</option>').join('');
   if(d.bootstrap&&d.methods.includes('email_otp'))methodSelect.value='email_otp';else if(d.methods.includes('totp'))methodSelect.value='totp';
   await prepareMfaMethod();
  }catch(e){
@@ -119,7 +120,7 @@ verifyOtpBtn.addEventListener('click',async()=>{
  finally{setBusy(verifyOtpBtn,false,'Verify and sign in')}
 });
 backBtn.addEventListener('click',()=>{
- challengeId='';otpStep.hidden=true;credentialsStep.hidden=false;stepTitle.textContent='Welcome back';stepIntro.textContent='Sign in to your workspace';
+ challengeId='';otpStep.hidden=true;credentialsStep.hidden=false;stepTitle.textContent='Sign in';stepIntro.textContent='Sign in to your workspace';
  document.querySelector('#otpCode').value='';showError('');resetTurnstile();
 });
 document.querySelector('#otpCode').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();verifyOtpBtn.click()}});
