@@ -27,6 +27,25 @@ sequenceDiagram
   M-->>F: SES delivery result
 ```
 
+## Time and onboarding UI data flow
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant B as Browser workflow page
+  participant F as Tenant-scoped Pages Function
+  participant D as D1 and audit log
+  U->>B: Record time or update onboarding task
+  B->>F: Authenticated same-origin JSON request
+  F->>F: Check session, feature, role and ownership
+  F->>D: Persist change and audit event
+  D-->>F: Result
+  F-->>B: JSON status
+  B->>F: Reload current data
+```
+
+Time and onboarding are stored in JelHR; there is no live cross-tab subscription or external payroll/attendance synchronization.
+
 ## Tenant model
 
 ```mermaid
