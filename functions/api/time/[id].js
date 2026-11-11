@@ -26,7 +26,8 @@ export async function onRequestPatch(context) {
   if (t.employee_id !== user.employee_id) throw new HttpError(403, "You can only edit your own entries");
   if (t.approval_status !== "pending") throw new HttpError(409, "Reviewed entries cannot be edited");
   const note = b.note !== undefined ? v.text(b.note, "Note", { max: 300 }) : t.note;
-  const breakMinutes = b.breakMinutes !== undefined ? v.int(b.breakMinutes, "Break minutes", { min: 0, max: 24 * 60 }) : t.break_minutes;
+  const elapsed = Math.max(0, Math.floor((Date.parse(t.ended_at || now) - Date.parse(t.started_at)) / 60000));
+  const breakMinutes = b.breakMinutes !== undefined ? v.int(b.breakMinutes, "Break minutes", { min: 0, max: Math.min(24 * 60, elapsed) }) : t.break_minutes;
   await env.DB.batch([
     env.DB.prepare("UPDATE time_entries SET note=?, break_minutes=? WHERE id=?").bind(note, breakMinutes, t.id),
     await auditStatement(env, user, "time.edited", "time_entry", t.id, null, request)

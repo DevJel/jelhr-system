@@ -47,6 +47,10 @@ The organization is **always** derived from the verified session, never from the
 - Provider credentials are Cloudflare secrets, never in D1 or responses. `/api/health` reports only booleans.
 - Header injection is stripped from every address and subject. Applicants need recorded consent; former employees can opt out and are only contacted at a personal address.
 
+## Time and onboarding workflow boundaries
+
+The time and onboarding pages use session-derived tenant identity and rely on API role, ownership and feature checks. Time reviewers cannot approve their own entries; employee edits apply only to their own pending records. Onboarding task creation/deletion is HR-only. Break edits are limited to elapsed shift time. Audit writes remain server-side.
+
 ## Known limitations
 
 - **PBKDF2 at 100k** is below OWASP's 600k recommendation for PBKDF2-SHA256; it is the platform ceiling. Long minimum length, rate limits and lockouts compensate. A memory-hard KDF would require a WASM implementation.

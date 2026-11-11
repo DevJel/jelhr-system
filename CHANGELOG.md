@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — synced time and onboarding workflows
+
+- Replaced demo time and onboarding pages with authenticated, persisted workflows and linked them from the dashboard and employee workspace.
+- Added time review, own-entry editing, onboarding task creation and completion, and tenant/role isolation tests.
+- Reject edited break durations exceeding elapsed entry time. No migration or new external binding is required.
+- Payroll, attendance, leave, projects and external system synchronization remain out of scope.
+
 ## Unreleased — sign-in backend and agent handoff
 - Expanded public workspace sign-in options to expose the configured MFA level and allowed factor types without exposing secrets or user records.
 - Removed development OTP values from the MFA email-send API response.

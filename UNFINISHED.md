@@ -1,5 +1,9 @@
 # JelHR v0.4 — frontend implementation status
 
+## Workflow sync update (unreleased)
+
+The time and onboarding screens now call their existing tenant APIs instead of using browser-local sample data. The dashboard and employee workspace link to them. This is not a claim that every JelHR feature is synchronized or production-ready. Payroll, attendance, leave, projects, invoices, payslips, meetings and external system synchronization are not provided by these changes. Pagination and real-time cross-session refresh are not implemented. Complete the release gates below using synthetic data before production.
+
 The v0.4 backend and migration 0004 are deployed in the Operava Business Pages project. This branch builds the corresponding browser workflows while preserving the v0.3 pages. It is a draft PR and is not deployed to production.
 
 ## Backend implemented

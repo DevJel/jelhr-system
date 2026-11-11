@@ -42,6 +42,13 @@ All tenant APIs are same-origin Pages Functions under `/api`. JSON request and r
 | GET/POST/PATCH | `/api/offboarding`, `/api/offboarding/:id` | Offboarding cases, tasks, approvals and closure. |
 | GET/POST/PATCH | `/api/time` | Time clock and timesheet workflows. |
 
+### Time and onboarding workflow details
+
+All requests require the effective `time` or `onboarding` feature and a tenant session. Reads default to the caller's own employee record; `scope=team` is limited to HR/auditors or a manager's direct reports. Time accepts optional `from` and `to` UTC start-date filters, defaults to the last 30 days, and returns at most 1,000 entries. Onboarding returns at most 2,000 tasks. There is no pagination in these routes.
+
+- `POST /api/time` takes `action: clock_in|clock_out`, optional `note`, and `breakMinutes` on clock-out. Entries are stored and audited. `PATCH /api/time/:id` supports own pending-entry `note` and `breakMinutes`, or manager/HR `approvalStatus: pending|approved|rejected`; self-approval is prohibited. Breaks cannot exceed elapsed entry time.
+- `POST /api/onboarding` requires HR access and `employeeId`, plus `plan: standard` or a custom `title` and optional `ownerLabel`, `dueDate`, and `description`. `PATCH /api/onboarding/:id` supports `completed`; HR can also edit task fields. `DELETE` requires HR. Changes are audited and enforced by the backend, not by UI visibility.
+
 ## Recruitment
 
 | Method | Route | Purpose |
